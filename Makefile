@@ -4,6 +4,8 @@ DEBUG_FLAG=-g
 
 CXXFLAGS+=$(OPTIMIZE_FLAG) $(DEBUG_FLAG)
 CXXFLAGS+=$(USER_DEFINE_FLAGS)
+CXXFLAGS+=-MMD -MP -O3
+CXXFLAGS+=-fpermissive
 
 LDLIBS+= 
 LDFLAGS+= 
@@ -29,6 +31,7 @@ LIB_DIRS += -L./include
 executives=canny
 sources= canny.cpp
 objects= $(subst .cpp,.o,$(sources))
+dependencies= $(subst .cpp,.d,$(sources))
 	
 ### what to do? ###
 $(executives): %: %.o
@@ -41,12 +44,8 @@ $(executives): %: $(objects)
 %.o:%.cc
 	$(CXX) $(CXXFLAGS) $(INCLUDE_DIRS) -c $< -o $@ $(COMPILER_ERROR)
 
-### Dependency autogen ###
-make_deps=Makefile.deps
--include $(make_deps)
-$(make_deps): $(sources) Makefile
-	makedepend -f- $(INCLUDE_DIRS) $(sources) > $@ 2> /dev/null
+-include $(sources:.cpp=.d)
 
 ### phony ###
 clean: 
-	rm -f $(objects) $(executives) $(make_deps) $(COMPILER_ERROR) $(LINKER_ERROR)
+	rm -f $(executives) $(objects) $(dependencies) $(COMPILER_ERROR) $(LINKER_ERROR)

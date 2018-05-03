@@ -46,7 +46,7 @@ $(objects):%.o:%.cpp
 
 ### phony ###
 run: $(executives)
-	./$(executives) lena_std_short.bmp
+	./$(executives) lena_std_short.bmp out.bmp
 
 clean: 
 	rm -f $(executives) $(objects) $(dependencies) $(COMPILER_ERROR) $(LINKER_ERROR)

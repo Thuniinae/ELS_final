@@ -29,8 +29,7 @@ LIB_DIRS += -L./include
 
 ### Definitions ###
 executives=canny
-canny: tb=main.cpp
-sources= void.cpp $(tb)
+sources= void.cpp main.cpp
 objects= $(subst .cpp,.o,$(sources))
 dependencies= $(subst .cpp,.d,$(sources))
 	

@@ -34,7 +34,6 @@ objects= $(subst .cpp,.o,$(sources))
 dependencies= $(subst .cpp,.d,$(sources))
 	
 ### what to do? ###
-$(executives): %: %.o
 $(executives): %: $(objects)
 	$(CXX) $(LDFLAGS) $(LIB_DIRS) $^ -o $@ $(LINKER_ERROR) $(LDLIBS) 
 

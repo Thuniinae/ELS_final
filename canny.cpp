@@ -10,7 +10,7 @@
 #define MAX_BRIGHTNESS 255
 
 // C99 doesn't define M_PI (GNU-C99 does)
-#define M_PI 3.14159265358979323846264338327
+//#define M_PI 3.14159265358979323846264338327
 
 /*
  * Loading part taken from

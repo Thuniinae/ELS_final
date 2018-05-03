@@ -21,7 +21,7 @@ endif
 
 #Included headers 
 INCLUDE_DIRS = -I. 
-INCLUDE_DIRS += -I./include
+INCLUDE_DIRS += -I./common
 
 #Included libraries
 LIB_DIRS = -L. 
@@ -29,22 +29,25 @@ LIB_DIRS += -L./include
 
 ### Definitions ###
 executives=canny
-sources= canny.cpp
+canny: tb=main.cpp
+sources= void.cpp $(tb)
 objects= $(subst .cpp,.o,$(sources))
 dependencies= $(subst .cpp,.d,$(sources))
 	
 ### what to do? ###
-$(executives): %: $(objects)
-	$(CXX) $(LDFLAGS) $(LIB_DIRS) $^ -o $@ $(LINKER_ERROR) $(LDLIBS) 
+all: canny
 
-%.o:%.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDE_DIRS) -c $< -o $@ $(COMPILER_ERROR)
+canny: $(objects)
+	$(CXX) $(LDFLAGS) $(LIB_DIRS) $(objects) -o $@ $(LINKER_ERROR) $(LDLIBS) 
 
-%.o:%.cc
+$(objects):%.o:%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE_DIRS) -c $< -o $@ $(COMPILER_ERROR)
 
 -include $(sources:.cpp=.d)
 
 ### phony ###
+run: $(executives)
+	./$(executives) lena_std_short.bmp
+
 clean: 
 	rm -f $(executives) $(objects) $(dependencies) $(COMPILER_ERROR) $(LINKER_ERROR)

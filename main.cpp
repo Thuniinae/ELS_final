@@ -1,12 +1,13 @@
 #include <iostream>
 #include <string>
+using namespace std;
 
 // Wall Clock Time Measurement
 #include <sys/time.h>
 
 #include "bmp.h"
+#include "Testbench.h"
 
-using namespace std;
 
 // TIMEVAL STRUCT IS Defined ctime
 // use start_time and end_time variables to capture 
@@ -22,6 +23,8 @@ int main(int argc, char *argv[])
       return 0;
     }
     cout << "Starting Simulation" << endl;
+
+		Testbench tb;
 
     ifstream tb_infile;
     ofstream tb_outfile_c;

@@ -31,12 +31,7 @@ int sc_main(int argc, char **argv)
 
     gettimeofday(&start_time, 0);
 		// Processing
-		for (unsigned int i = 0; i< tb.get_height(); i++) {
-			for (unsigned int j = 0; j< tb.get_width_bytes(); j++) {
-				unsigned int n = i*tb.get_width_bytes()+j;
-				tb.get_target_image()[n] = tb.get_source_image()[n];
-			}
-		}
+		sobel(90.0, tb.get_width(), tb.get_height(), tb.get_bytes_per_pixel(), tb.get_source_image(), tb.get_target_image());
     gettimeofday(&end_time, 0);
 		
 		tb.write_bmp(argv[2]);

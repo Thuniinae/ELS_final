@@ -27,7 +27,7 @@ class Testbench
 			return bmp.get_width_bytes();
 		}
 
-		unsigned int get_byte_per_pixel() {
+		unsigned int get_bytes_per_pixel() {
 			return bmp.get_bytes_per_pixel();
 		}
 

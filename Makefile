@@ -7,8 +7,11 @@ CXXFLAGS+=$(USER_DEFINE_FLAGS)
 CXXFLAGS+=-MMD -MP -O3
 CXXFLAGS+=-fpermissive
 
-LDLIBS+= 
-LDFLAGS+= 
+SYSTEMC_HOME?=$(HOME)/usr/local/systemc-2.3.1
+SYSTEMC_LIB = lib-linux64
+
+LDLIBS+= -lsystemc
+LDFLAGS+= -Wl,-rpath,$(SYSTEMC_HOME)/$(SYSTEMC_LIB)
 
 ### If you want to keep the compilation/linking errors ###
 ifeq ($(ERRLOG), 1)
@@ -22,14 +25,15 @@ endif
 #Included headers 
 INCLUDE_DIRS = -I. 
 INCLUDE_DIRS += -I./common
+INCLUDE_DIRS += -I$(SYSTEMC_HOME)/include
 
 #Included libraries
 LIB_DIRS = -L. 
-LIB_DIRS += -L./include
+LIB_DIRS += -L$(SYSTEMC_HOME)/$(SYSTEMC_LIB)
 
 ### Definitions ###
 executives=sobel
-sources= main.cpp Testbench.cpp
+sources= main.cpp Testbench.cpp Sobel.cpp
 objects= $(subst .cpp,.o,$(sources))
 dependencies= $(subst .cpp,.d,$(sources))
 	

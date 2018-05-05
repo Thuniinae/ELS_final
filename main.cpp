@@ -7,6 +7,7 @@ using namespace std;
 
 #include "bmp.h"
 #include "Testbench.h"
+#include "Sobel.h"
 
 
 // TIMEVAL STRUCT IS Defined ctime
@@ -14,7 +15,8 @@ using namespace std;
 // start of simulation and end of simulation
 struct timeval start_time, end_time;
 
-int main(int argc, char *argv[])
+//int main(int argc, char *argv[])
+int sc_main(int argc, char **argv)
 {
     if((argc < 3)||(argc > 4))
     {

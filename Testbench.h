@@ -15,15 +15,27 @@ class Testbench
 		void read_bmp(string infile_name);
 		void write_bmp(string outfile_name);
 
+		unsigned int width() {
+			return bmp.get_width();
+		}
+
+		unsigned int height() {
+			return bmp.get_height();
+		}
+
+		unsigned int byte_per_pixel() {
+			return bmp.get_bytes_per_pixel();
+		}
+
 		unsigned int size() {
 			return _size;
 		}
 
-		char get_byte (unsigned int i) {
-			return source_bitmap[i];
+		char* get_source_image () {
+			return source_bitmap;
 		}
-		void put_byte (unsigned int i, char b) {
-			target_bitmap[i] = b;
+		char* get_target_image () {
+			return target_bitmap;
 		}
     
 	private:

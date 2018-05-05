@@ -144,7 +144,7 @@ class bmp_data
         const unsigned int FILE_HEADER_LEN;
         const unsigned int INFO_HEADER_LEN;
 
-        bmp_data(char * name="",const unsigned int fl=14, const unsigned int il=40)
+        bmp_data(char * name=NULL,const unsigned int fl=14, const unsigned int il=40)
             :bfName(name)
             ,FILE_HEADER_LEN(fl)
             ,INFO_HEADER_LEN(il)

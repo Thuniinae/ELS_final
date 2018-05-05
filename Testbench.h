@@ -15,20 +15,20 @@ class Testbench
 		void read_bmp(string infile_name);
 		void write_bmp(string outfile_name);
 
-		unsigned int width() {
+		unsigned int get_width() {
 			return bmp.get_width();
 		}
 
-		unsigned int height() {
+		unsigned int get_height() {
 			return bmp.get_height();
 		}
-
-		unsigned int byte_per_pixel() {
-			return bmp.get_bytes_per_pixel();
+		
+		unsigned int get_width_bytes() {
+			return bmp.get_width_bytes();
 		}
 
-		unsigned int size() {
-			return _size;
+		unsigned int get_byte_per_pixel() {
+			return bmp.get_bytes_per_pixel();
 		}
 
 		char* get_source_image () {
@@ -43,6 +43,5 @@ class Testbench
 		char *target_bitmap;
     bmp_data bmp;
     bmp_data bmp_out_c;
-		unsigned int _size;
 };
 #endif

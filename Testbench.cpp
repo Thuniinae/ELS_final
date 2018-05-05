@@ -1,7 +1,7 @@
 #include "Testbench.h"
 #include "bmp.h"
 
-Testbench::Testbench(): _size(0) {
+Testbench::Testbench() {
 }
 
 Testbench::~Testbench() {
@@ -20,7 +20,6 @@ void Testbench::read_bmp(string infile_name) {
 	cout << "bmp.get_bytes_per_pixel() == " << bmp.get_bytes_per_pixel() << endl;
 	cout << "bmp.get_width_bytes() == " << bmp.get_width_bytes() << endl;
 	cout << "bmp.get_height() == " << bmp.get_height() << endl;
-	_size = bmp.get_width() * bmp.get_height();
 	source_bitmap = new char [bmp.get_width_bytes()*bmp.get_height()];
 	target_bitmap = new char [bmp.get_width_bytes()*bmp.get_height()];
 	for (unsigned int i = 0; i< bmp.get_height(); i++) {

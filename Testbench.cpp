@@ -1,5 +1,28 @@
+#include <cstdio>
+#include <cstdlib>
+using namespace std;
+
 #include "Testbench.h"
-#include "bmp.h"
+
+unsigned char header[54] = {
+  0x42,        // identity : B
+  0x4d,        // identity : M
+  0, 0, 0, 0,  // file size
+  0, 0,        // reserved1
+  0, 0,        // reserved2
+  54, 0, 0, 0, // RGB data offset
+  40, 0, 0, 0, // struct BITMAPINFOHEADER size
+  0, 0, 0, 0,  // bmp width
+  0, 0, 0, 0,  // bmp height
+  1, 0,        // planes
+  24, 0,       // bit per pixel
+  0, 0, 0, 0,  // compression
+  0, 0, 0, 0,  // data size
+  0, 0, 0, 0,  // h resolution
+  0, 0, 0, 0,  // v resolution
+  0, 0, 0, 0,  // used colors
+  0, 0, 0, 0   // important colors
+};
 
 Testbench::Testbench() {
 }
@@ -7,38 +30,85 @@ Testbench::Testbench() {
 Testbench::~Testbench() {
 }
 
-void Testbench::read_bmp(string infile_name) {
-	ifstream tb_infile;
-	tb_infile.open(infile_name.c_str(), ios::binary);
-	if(!tb_infile.is_open())
-	{
-		cout << "Input File Open Error" << endl;
-	}
-	bmp.read_file_header(tb_infile);
-	bmp.read_info_header(tb_infile);
-	cout << "bmp.get_width() == " << bmp.get_width() << endl;
-	cout << "bmp.get_bytes_per_pixel() == " << bmp.get_bytes_per_pixel() << endl;
-	cout << "bmp.get_width_bytes() == " << bmp.get_width_bytes() << endl;
-	cout << "bmp.get_height() == " << bmp.get_height() << endl;
-	source_bitmap = new char [bmp.get_width_bytes()*bmp.get_height()];
-	target_bitmap = new char [bmp.get_width_bytes()*bmp.get_height()];
-	for (unsigned int i = 0; i< bmp.get_height(); i++) {
-		bmp.read_row(i, &source_bitmap[i*bmp.get_width_bytes()], tb_infile);
-	}
+int Testbench::read_bmp(string infile_name) {
+	FILE *fp_s = NULL;                 // source file handler
+  fp_s = fopen(infile_name.c_str(), "rb");
+  if (fp_s == NULL) {
+    printf("fopen %s error\n", infile_name.c_str());
+    return -1;
+  }
+  // move offset to 10 to find rgb raw data offset
+  fseek(fp_s, 10, SEEK_SET);
+  fread(&rgb_raw_data_offset, sizeof(unsigned int), 1, fp_s);
+ 
+  // move offset to 18 to get width & height;
+  fseek(fp_s, 18, SEEK_SET);
+  fread(&width,  sizeof(unsigned int), 1, fp_s);
+  fread(&height, sizeof(unsigned int), 1, fp_s);
+ 
+  // get bit per pixel
+  fseek(fp_s, 28, SEEK_SET);
+  fread(&bits_per_pixel, sizeof(unsigned short), 1, fp_s);
+  bytes_per_pixel = bits_per_pixel / 8;
+ 
+  // move offset to rgb_raw_data_offset to get RGB raw data
+  fseek(fp_s, rgb_raw_data_offset, SEEK_SET);
+     
+  source_bitmap = (unsigned char *)malloc((size_t)width * height * bytes_per_pixel);
+  if (source_bitmap == NULL) {
+    printf("malloc images_s error\n");
+    return -1;
+  }
+   
+  target_bitmap = (unsigned char *)malloc((size_t)width * height * bytes_per_pixel);
+  if (target_bitmap == NULL) {
+    printf("malloc target_bitmap error\n");
+    return -1;
+  }
+   
+  fread(source_bitmap, sizeof(unsigned char), (size_t)(long)width * height * bytes_per_pixel, fp_s);
+  fclose(fp_s);
+	return 0;
 }
 
-void Testbench::write_bmp(string outfile_name) {
-	ofstream tb_outfile_c;
-	tb_outfile_c.open(outfile_name.c_str(), ios::binary);
-	if(!tb_outfile_c.is_open())
-	{
-		cout << "Color Output File Open Error" << endl;
-	}
-	bmp_out_c.fhdt = bmp.fhdt;
-	bmp_out_c.write_file_header(tb_outfile_c);
-	bmp_out_c.ihdt = bmp.ihdt;
-	bmp_out_c.write_info_header(tb_outfile_c);
-	for (unsigned int i = 0; i< bmp_out_c.get_height(); i++) {
-		bmp_out_c.write_row(i, &target_bitmap[i*bmp.get_width_bytes()], tb_outfile_c);
-	}
+int Testbench::write_bmp(string outfile_name) {
+	FILE *fp_t = NULL;                 // target file handler
+  unsigned int file_size; // file size
+ 
+  fp_t = fopen(outfile_name.c_str(), "wb");
+  if (fp_t == NULL) {
+    printf("fopen %s error\n", outfile_name.c_str());
+    return -1;
+  }
+      
+  // file size 
+  file_size = width * height * bytes_per_pixel + rgb_raw_data_offset;
+  header[2] = (unsigned char)(file_size & 0x000000ff);
+  header[3] = (file_size >> 8)  & 0x000000ff;
+  header[4] = (file_size >> 16) & 0x000000ff;
+  header[5] = (file_size >> 24) & 0x000000ff;
+    
+  // width
+  header[18] = width & 0x000000ff;
+  header[19] = (width >> 8)  & 0x000000ff;
+  header[20] = (width >> 16) & 0x000000ff;
+  header[21] = (width >> 24) & 0x000000ff;
+    
+  // height
+  header[22] = height &0x000000ff;
+  header[23] = (height >> 8)  & 0x000000ff;
+  header[24] = (height >> 16) & 0x000000ff;
+  header[25] = (height >> 24) & 0x000000ff;
+    
+  // bit per pixel
+  header[28] = bits_per_pixel;
+  
+  // write header
+  fwrite(header, sizeof(unsigned char), rgb_raw_data_offset, fp_t);
+ 
+  // write image
+  fwrite(target_bitmap, sizeof(unsigned char), (size_t)(long)width * height * bytes_per_pixel, fp_t);
+    
+  fclose(fp_t);
+	return 0;
 }

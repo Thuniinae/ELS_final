@@ -4,44 +4,46 @@
 #include <string>
 using namespace std;
 
-#include "bmp.h"
-
 class Testbench
 {
 	public:
 		Testbench();
 		~Testbench();
 
-		void read_bmp(string infile_name);
-		void write_bmp(string outfile_name);
+		int read_bmp(string infile_name);
+		int write_bmp(string outfile_name);
 
 		unsigned int get_width() {
-			return bmp.get_width();
+			return width;
 		}
 
 		unsigned int get_height() {
-			return bmp.get_height();
+			return height;
 		}
 		
 		unsigned int get_width_bytes() {
-			return bmp.get_width_bytes();
+			return width_bytes;
 		}
 
 		unsigned int get_bytes_per_pixel() {
-			return bmp.get_bytes_per_pixel();
+			return bytes_per_pixel;
 		}
 
-		char* get_source_image () {
+		unsigned char* get_source_image () {
 			return source_bitmap;
 		}
-		char* get_target_image () {
+		unsigned char* get_target_image () {
 			return target_bitmap;
 		}
     
 	private:
-		char *source_bitmap;
-		char *target_bitmap;
-    bmp_data bmp;
-    bmp_data bmp_out_c;
+		unsigned int rgb_raw_data_offset;
+		unsigned int width;
+		unsigned int height;
+		unsigned int width_bytes;
+		unsigned char  bits_per_pixel;
+		unsigned short bytes_per_pixel;
+		unsigned char *source_bitmap;
+		unsigned char *target_bitmap;
 };
 #endif

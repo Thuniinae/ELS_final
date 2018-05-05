@@ -5,7 +5,6 @@ using namespace std;
 // Wall Clock Time Measurement
 #include <sys/time.h>
 
-#include "bmp.h"
 #include "Testbench.h"
 #include "Sobel.h"
 

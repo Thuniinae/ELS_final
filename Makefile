@@ -28,15 +28,15 @@ LIB_DIRS = -L.
 LIB_DIRS += -L./include
 
 ### Definitions ###
-executives=canny
-sources= void.cpp main.cpp
+executives=sobel
+sources= void.cpp main.cpp Testbench.cpp
 objects= $(subst .cpp,.o,$(sources))
 dependencies= $(subst .cpp,.d,$(sources))
 	
 ### what to do? ###
-all: canny
+all: sobel
 
-canny: $(objects)
+sobel: $(objects)
 	$(CXX) $(LDFLAGS) $(LIB_DIRS) $(objects) -o $@ $(LINKER_ERROR) $(LDLIBS) 
 
 $(objects):%.o:%.cpp
@@ -45,8 +45,8 @@ $(objects):%.o:%.cpp
 -include $(sources:.cpp=.d)
 
 ### phony ###
-run: $(executives)
-	./$(executives) lena_std_short.bmp out.bmp
+run: sobel
+	./sobel lena_std_short.bmp out.bmp
 
 clean: 
 	rm -f $(executives) $(objects) $(dependencies) $(COMPILER_ERROR) $(LINKER_ERROR)

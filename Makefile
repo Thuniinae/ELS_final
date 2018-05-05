@@ -29,7 +29,7 @@ LIB_DIRS += -L./include
 
 ### Definitions ###
 executives=sobel
-sources= void.cpp main.cpp Testbench.cpp
+sources= main.cpp Testbench.cpp
 objects= $(subst .cpp,.o,$(sources))
 dependencies= $(subst .cpp,.d,$(sources))
 	

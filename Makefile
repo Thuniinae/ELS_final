@@ -51,6 +51,7 @@ $(objects):%.o:%.cpp
 ### phony ###
 run: sobel
 	./sobel lena_std_short.bmp out.bmp
+	diff out.bmp golden/lena_std_short_sobel.bmp
 
 clean: 
 	rm -f $(executives) $(objects) $(dependencies) $(COMPILER_ERROR) $(LINKER_ERROR)

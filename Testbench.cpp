@@ -129,9 +129,9 @@ int color_to_int(int r, int g, int b) { return (r + g + b) / 3; }
 void Testbench::do_sobel() {
   unsigned int x, y, i, v, u; // for loop counter
   unsigned char R, G, B;      // color of R, G, B
-  double val[MASK_N] = {0.0};
+  int val[MASK_N] = {0};
   int adjustX, adjustY, xBound, yBound;
-  double total;
+  int total;
 
   for (y = 0; y != height; ++y) {
     for (x = 0; x != width; ++x) {
@@ -155,7 +155,7 @@ void Testbench::do_sobel() {
         }
       }
 
-      total = 0.0;
+      total = 0;
       for (i = 0; i != MASK_N; ++i) {
         total += val[i] * val[i];
       }

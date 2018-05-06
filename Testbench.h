@@ -17,16 +17,15 @@ using namespace sc_core;
 class Testbench: public sc_module {
 public:
 	sc_in_clk i_clk;
-	/*
 	unsigned char *o_r;
 	unsigned char *o_g;
 	unsigned char *o_b;
 	bool *o_r_g_b_valid;
-	bool *i_r_g_b_ready;
 	sc_event *o_r_g_b_valid_event;
-	bool *o_done;
-	sc_event *o_done_event;
-	*/
+	int *i_result;
+	bool *i_result_valid;
+	sc_event *i_result_valid_event;
+
 	SC_HAS_PROCESS( Testbench );
 
   Testbench( sc_module_name n );

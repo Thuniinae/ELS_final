@@ -18,14 +18,14 @@ int sobel(double threshold, unsigned int width, unsigned int height,
   for (y = 0; y != height; ++y) {
     for (x = 0; x != width; ++x) {
       for (i = 0; i != MASK_N; ++i) {
-        adjustX = (MASK_X % 2) ? 1 : 0;
-        adjustY = (MASK_Y % 2) ? 1 : 0;
-        xBound = MASK_X / 2;
-        yBound = MASK_Y / 2;
+        adjustX = (MASK_X % 2) ? 1 : 0; //1
+        adjustY = (MASK_Y % 2) ? 1 : 0; //1
+        xBound = MASK_X / 2; //1
+        yBound = MASK_Y / 2; //1
 
         val[i] = 0.0;
-        for (v = -yBound; v != yBound + adjustY; ++v) {
-          for (u = -xBound; u != xBound + adjustX; ++u) {
+        for (v = -yBound; v != yBound + adjustY; ++v) { //-1, 0, 1
+          for (u = -xBound; u != xBound + adjustX; ++u) { //-1, 0, 1
             if (x + u >= 0 && x + u < width && y + v >= 0 && y + v < height) {
               R = *(image_s + byte_per_pixel * (width * (y + v) + (x + u)) + 2);
               G = *(image_s + byte_per_pixel * (width * (y + v) + (x + u)) + 1);

@@ -119,22 +119,11 @@ int Testbench::write_bmp(string outfile_name) {
   return 0;
 }
 
-// sobel mask
-int mask[MASK_N][MASK_X][MASK_Y] = {{{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}},
-
-                                    {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}}};
-
-int color_to_int(int r, int g, int b) { return (r + g + b) / 3; }
-
 void Testbench::do_sobel() {
   unsigned int x, y, i, v, u; // for loop counter
   unsigned char R, G, B;      // color of R, G, B
-  int val[MASK_N] = {0};
   int adjustX, adjustY, xBound, yBound;
   int total;
-	unsigned char rSpace[MASK_X][MASK_Y] = {0};
-	unsigned char gSpace[MASK_X][MASK_Y] = {0};
-	unsigned char bSpace[MASK_X][MASK_Y] = {0};
 
   for (y = 0; y != height; ++y) {
     for (x = 0; x != width; ++x) {
@@ -143,8 +132,6 @@ void Testbench::do_sobel() {
       xBound = MASK_X / 2;            // 1
       yBound = MASK_Y / 2;            // 1
 
-      val[0] = 0;
-      val[1] = 0;
       for (v = -yBound; v != yBound + adjustY; ++v) {   //-1, 0, 1
         for (u = -xBound; u != xBound + adjustX; ++u) { //-1, 0, 1
           if (x + u >= 0 && x + u < width && y + v >= 0 && y + v < height) {
@@ -160,29 +147,13 @@ void Testbench::do_sobel() {
 						G = 0;
 						B = 0;
 					}
-					rSpace[u+xBound][v+yBound] = R;
-					gSpace[u+xBound][v+yBound] = G;
-					bSpace[u+xBound][v+yBound] = B;
+					o_r.write(R);
+					o_g.write(G);
+					o_b.write(B);
         }
       }
 
-			for (v = 0; v < MASK_Y; ++v) {
-				for (u = 0; u < MASK_X; ++u) {
-            for (i = 0; i != MASK_N; ++i) {
-							R = rSpace[u][v];
-							G = gSpace[u][v];
-							B = bSpace[u][v];
-              val[i] += color_to_int(R, G, B) * mask[i][u][v];
-            }
-				}
-			}
-
-      total = 0;
-      for (i = 0; i != MASK_N; ++i) {
-        total += val[i] * val[i];
-      }
-
-      total = sqrt(total);
+			total = i_result.read();
 
       if (total - THRESHOLD >= 0) {
         // black

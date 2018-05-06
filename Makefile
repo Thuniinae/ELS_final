@@ -33,7 +33,7 @@ LIB_DIRS += -L$(SYSTEMC_HOME)/$(SYSTEMC_LIB)
 
 ### Definitions ###
 executives=sobel
-sources= main.cpp Testbench.cpp
+sources= main.cpp Testbench.cpp Filter.cpp
 objects= $(subst .cpp,.o,$(sources))
 dependencies= $(subst .cpp,.d,$(sources))
 	

@@ -6,6 +6,7 @@ using namespace std;
 #include <sys/time.h>
 
 #include "Testbench.h"
+#include "Filter.h"
 
 // TIMEVAL STRUCT IS Defined ctime
 // use start_time and end_time variables to capture
@@ -22,9 +23,23 @@ int sc_main(int argc, char **argv) {
   }
   cout << "Starting Simulation" << endl;
 
-	sc_clock clk( "clk", 1, SC_NS );
   Testbench tb("tb");
+	Filter filter("filter");
+	sc_clock clk( "clk", 1, SC_NS );
+	sc_fifo<unsigned char> r;
+	sc_fifo<unsigned char> g;
+	sc_fifo<unsigned char> b;
+	sc_fifo<int> result;
 	tb.i_clk(clk);
+	filter.i_clk(clk);
+	tb.o_r(r);
+	tb.o_g(g);
+	tb.o_b(b);
+	tb.i_result(result);
+	filter.i_r(r);
+	filter.i_g(g);
+	filter.i_b(b);
+	filter.o_result(result);
 
   tb.read_bmp(argv[1]);
 

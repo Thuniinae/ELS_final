@@ -17,6 +17,11 @@ using namespace sc_core;
 class Testbench : public sc_module {
 public:
 	sc_in_clk i_clk;
+	sc_fifo_out< unsigned char > o_r;
+	sc_fifo_out< unsigned char > o_g;
+	sc_fifo_out< unsigned char > o_b;
+	sc_fifo_in< int > i_result;
+	/*
 	unsigned char *o_r;
 	unsigned char *o_g;
 	unsigned char *o_b;
@@ -29,6 +34,7 @@ public:
 	sc_event *i_result_valid_event;
 	bool *o_result_ready;
 	sc_event *o_result_ready_event;
+	*/
 
   SC_HAS_PROCESS(Testbench);
 

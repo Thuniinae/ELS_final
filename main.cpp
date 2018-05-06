@@ -5,7 +5,6 @@ using namespace std;
 // Wall Clock Time Measurement
 #include <sys/time.h>
 
-#include "Sobel.h"
 #include "Testbench.h"
 
 // TIMEVAL STRUCT IS Defined ctime
@@ -23,13 +22,13 @@ int sc_main(int argc, char **argv) {
   }
   cout << "Starting Simulation" << endl;
 
-  Testbench tb;
+	sc_clock clk( "clk", 1, SC_NS );
+  Testbench tb("tb");
+	tb.i_clk(clk);
   tb.read_bmp(argv[1]);
 
   gettimeofday(&start_time, 0);
-  // Processing
-  sobel(90.0, tb.get_width(), tb.get_height(), tb.get_bytes_per_pixel(),
-        tb.get_source_image(), tb.get_target_image());
+	sc_start();
   gettimeofday(&end_time, 0);
 
   tb.write_bmp(argv[2]);

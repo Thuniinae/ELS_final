@@ -26,21 +26,25 @@ void Filter::do_filter() {
 				rSpace[u][v] = i_r.read();
 				gSpace[u][v] = i_g.read();
 				bSpace[u][v] = i_b.read();
+				wait();
 			}
 		}
 		for (unsigned int i = 0; i<MASK_N; ++i) {
 			val[i] = 0;
+			wait();
 		}
 		for (unsigned int v = 0; v<MASK_Y; ++v) {
 			for (unsigned int u = 0; u<MASK_X; ++u) {
 				for (unsigned int i = 0; i != MASK_N; ++i) {
 					val[i] += color_to_int(rSpace[u][v], gSpace[u][v], bSpace[u][v]) * mask[i][u][v];
+					wait();
 				}
 			}
 		}
 		int total = 0;
 		for (unsigned int i = 0; i != MASK_N; ++i) {
 			total += val[i] * val[i];
+			wait();
 		}
 		o_result.write(sqrt(total));
 	}

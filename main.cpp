@@ -42,9 +42,8 @@ int sc_main(int argc, char **argv) {
 	filter.o_result(result);
 
   tb.read_bmp(argv[1]);
-
 	sc_start();
-
+	std::cout<< sc_core::sc_time_stamp() << std::endl;
   tb.write_bmp(argv[2]);
 
   return 0;

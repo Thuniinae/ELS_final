@@ -25,19 +25,12 @@ int sc_main(int argc, char **argv) {
 	sc_clock clk( "clk", 1, SC_NS );
   Testbench tb("tb");
 	tb.i_clk(clk);
+
   tb.read_bmp(argv[1]);
 
-  gettimeofday(&start_time, 0);
 	sc_start();
-  gettimeofday(&end_time, 0);
 
   tb.write_bmp(argv[2]);
 
-  int total_usecs = (end_time.tv_sec - start_time.tv_sec) * 1000000 +
-                    (end_time.tv_usec - start_time.tv_usec);
-
-  cout << "===============================================" << endl;
-  cout << "   Time Taken for simulation is: " << total_usecs << " uS" << endl;
-  cout << "===============================================" << endl;
   return 0;
 }

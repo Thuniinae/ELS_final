@@ -175,6 +175,5 @@ void Testbench::do_sobel() {
       }
     }
   }
-	cout<< "stop" <<endl;
 	sc_stop();
 }

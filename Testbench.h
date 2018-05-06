@@ -14,21 +14,21 @@ using namespace sc_core;
 #define BLACK 0
 #define THRESHOLD 90
 
-class Testbench: public sc_module {
+class Testbench : public sc_module {
 public:
-	sc_in_clk i_clk;
-	unsigned char *o_r;
-	unsigned char *o_g;
-	unsigned char *o_b;
-	bool *o_r_g_b_valid;
-	sc_event *o_r_g_b_valid_event;
-	int *i_result;
-	bool *i_result_valid;
-	sc_event *i_result_valid_event;
+  sc_in_clk i_clk;
+  unsigned char *o_r;
+  unsigned char *o_g;
+  unsigned char *o_b;
+  bool *o_r_g_b_valid;
+  sc_event *o_r_g_b_valid_event;
+  int *i_result;
+  bool *i_result_valid;
+  sc_event *i_result_valid_event;
 
-	SC_HAS_PROCESS( Testbench );
+  SC_HAS_PROCESS(Testbench);
 
-  Testbench( sc_module_name n );
+  Testbench(sc_module_name n);
   ~Testbench();
 
   int read_bmp(string infile_name);
@@ -55,6 +55,6 @@ private:
   unsigned char *source_bitmap;
   unsigned char *target_bitmap;
 
-	void do_sobel();
+  void do_sobel();
 };
 #endif

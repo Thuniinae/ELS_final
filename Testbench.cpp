@@ -24,10 +24,10 @@ unsigned char header[54] = {
     0,    0, 0, 0  // important colors
 };
 
-Testbench::Testbench(sc_module_name n): sc_module(n) {
-	SC_THREAD( do_sobel );
-	sensitive << i_clk.pos();
-	dont_initialize();
+Testbench::Testbench(sc_module_name n) : sc_module(n) {
+  SC_THREAD(do_sobel);
+  sensitive << i_clk.pos();
+  dont_initialize();
 }
 
 Testbench::~Testbench() {}
@@ -135,26 +135,29 @@ void Testbench::do_sobel() {
 
   for (y = 0; y != height; ++y) {
     for (x = 0; x != width; ++x) {
-        adjustX = (MASK_X % 2) ? 1 : 0; //1
-        adjustY = (MASK_Y % 2) ? 1 : 0; //1
-        xBound = MASK_X / 2; //1
-        yBound = MASK_Y / 2; //1
+      adjustX = (MASK_X % 2) ? 1 : 0; // 1
+      adjustY = (MASK_Y % 2) ? 1 : 0; // 1
+      xBound = MASK_X / 2;            // 1
+      yBound = MASK_Y / 2;            // 1
 
-        val[0] = 0;
-        val[1] = 0;
-        for (v = -yBound; v != yBound + adjustY; ++v) { //-1, 0, 1
-          for (u = -xBound; u != xBound + adjustX; ++u) { //-1, 0, 1
-            if (x + u >= 0 && x + u < width && y + v >= 0 && y + v < height) {
-              R = *(source_bitmap + bytes_per_pixel * (width * (y + v) + (x + u)) + 2);
-              G = *(source_bitmap + bytes_per_pixel * (width * (y + v) + (x + u)) + 1);
-              B = *(source_bitmap + bytes_per_pixel * (width * (y + v) + (x + u)) + 0);
+      val[0] = 0;
+      val[1] = 0;
+      for (v = -yBound; v != yBound + adjustY; ++v) {   //-1, 0, 1
+        for (u = -xBound; u != xBound + adjustX; ++u) { //-1, 0, 1
+          if (x + u >= 0 && x + u < width && y + v >= 0 && y + v < height) {
+            R = *(source_bitmap +
+                  bytes_per_pixel * (width * (y + v) + (x + u)) + 2);
+            G = *(source_bitmap +
+                  bytes_per_pixel * (width * (y + v) + (x + u)) + 1);
+            B = *(source_bitmap +
+                  bytes_per_pixel * (width * (y + v) + (x + u)) + 0);
 
-      for (i = 0; i != MASK_N; ++i) {
+            for (i = 0; i != MASK_N; ++i) {
               val[i] += color_to_int(R, G, B) * mask[i][u + xBound][v + yBound];
-      }
             }
           }
         }
+      }
 
       total = 0;
       for (i = 0; i != MASK_N; ++i) {
@@ -176,5 +179,5 @@ void Testbench::do_sobel() {
       }
     }
   }
-	sc_stop();
+  sc_stop();
 }

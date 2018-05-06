@@ -132,6 +132,9 @@ void Testbench::do_sobel() {
   int val[MASK_N] = {0};
   int adjustX, adjustY, xBound, yBound;
   int total;
+	unsigned char rSpace[MASK_X][MASK_Y] = {0};
+	unsigned char gSpace[MASK_X][MASK_Y] = {0};
+	unsigned char bSpace[MASK_X][MASK_Y] = {0};
 
   for (y = 0; y != height; ++y) {
     for (x = 0; x != width; ++x) {
@@ -151,13 +154,28 @@ void Testbench::do_sobel() {
                   bytes_per_pixel * (width * (y + v) + (x + u)) + 1);
             B = *(source_bitmap +
                   bytes_per_pixel * (width * (y + v) + (x + u)) + 0);
-
-            for (i = 0; i != MASK_N; ++i) {
-              val[i] += color_to_int(R, G, B) * mask[i][u + xBound][v + yBound];
-            }
           }
+					else {
+						R = 0;
+						G = 0;
+						B = 0;
+					}
+					rSpace[u+xBound][v+yBound] = R;
+					gSpace[u+xBound][v+yBound] = G;
+					bSpace[u+xBound][v+yBound] = B;
         }
       }
+
+			for (v = 0; v < MASK_Y; ++v) {
+				for (u = 0; u < MASK_X; ++u) {
+            for (i = 0; i != MASK_N; ++i) {
+							R = rSpace[u][v];
+							G = gSpace[u][v];
+							B = bSpace[u][v];
+              val[i] += color_to_int(R, G, B) * mask[i][u][v];
+            }
+				}
+			}
 
       total = 0;
       for (i = 0; i != MASK_N; ++i) {

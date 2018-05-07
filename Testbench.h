@@ -21,20 +21,6 @@ public:
 	sc_fifo_out< unsigned char > o_g;
 	sc_fifo_out< unsigned char > o_b;
 	sc_fifo_in< int > i_result;
-	/*
-	unsigned char *o_r;
-	unsigned char *o_g;
-	unsigned char *o_b;
-	bool *o_r_g_b_valid;
-	sc_event *o_r_g_b_valid_event;
-	bool *i_r_g_b_ready;
-	sc_event *i_r_g_b_ready_event;
-	int *i_result;
-	bool *i_result_valid;
-	sc_event *i_result_valid_event;
-	bool *o_result_ready;
-	sc_event *o_result_ready_event;
-	*/
 
   SC_HAS_PROCESS(Testbench);
 

@@ -1,5 +1,5 @@
-#ifndef FILTER_H_
-#define FILTER_H_
+#ifndef SOBEL_FILTER_H_
+#define SOBEL_FILTER_H_
 #include <systemc>
 using namespace sc_core;
 
@@ -10,7 +10,7 @@ using namespace sc_core;
 #define BLACK 0
 #define THRESHOLD 90
 
-class Filter: public sc_module
+class SobelFilter: public sc_module
 {
 public:
 	sc_in_clk i_clk;
@@ -19,9 +19,9 @@ public:
 	sc_fifo_in< unsigned char > i_b;
 	sc_fifo_out< int > o_result;
 
-	SC_HAS_PROCESS( Filter );
-	Filter( sc_module_name n );
-	~Filter();
+	SC_HAS_PROCESS( SobelFilter );
+	SobelFilter( sc_module_name n );
+	~SobelFilter();
 private:
 	void do_filter();
 };

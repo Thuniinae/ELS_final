@@ -1,12 +1,12 @@
-#include "Filter.h"
-Filter::Filter( sc_module_name n ): sc_module( n )
+#include "SobelFilter.h"
+SobelFilter::SobelFilter( sc_module_name n ): sc_module( n )
 {
 	SC_THREAD( do_filter );
 	sensitive << i_clk.pos();
 	dont_initialize();
 }
 
-Filter::~Filter() {}
+SobelFilter::~SobelFilter() {}
 
 // sobel mask
 int mask[MASK_N][MASK_X][MASK_Y] = {{{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}},
@@ -15,7 +15,7 @@ int mask[MASK_N][MASK_X][MASK_Y] = {{{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}},
 
 int color_to_int(int r, int g, int b) { return (r + g + b) / 3; }
 
-void Filter::do_filter() {
+void SobelFilter::do_filter() {
 	unsigned char rSpace[MASK_X][MASK_Y] = {0};
 	unsigned char gSpace[MASK_X][MASK_Y] = {0};
 	unsigned char bSpace[MASK_X][MASK_Y] = {0};

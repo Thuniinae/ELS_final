@@ -26,12 +26,15 @@ int sc_main(int argc, char **argv) {
   Testbench tb("tb");
 	SobelFilter sobel_filter("sobel_filter");
 	sc_clock clk( "clk", 1, SC_NS );
+	sc_signal<bool> rst("rst");
 	sc_fifo<unsigned char> r;
 	sc_fifo<unsigned char> g;
 	sc_fifo<unsigned char> b;
 	sc_fifo<int> result;
 	tb.i_clk(clk);
+	tb.o_rst(rst);
 	sobel_filter.i_clk(clk);
+	sobel_filter.i_rst(rst);
 	tb.o_r(r);
 	tb.o_g(g);
 	tb.o_b(b);

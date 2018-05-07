@@ -125,6 +125,9 @@ void Testbench::do_sobel() {
   int adjustX, adjustY, xBound, yBound;
   int total;
 
+	o_rst.write(false);
+	wait(5);
+	o_rst.write(true);
   for (y = 0; y != height; ++y) {
     for (x = 0; x != width; ++x) {
       adjustX = (MASK_X % 2) ? 1 : 0; // 1

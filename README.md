@@ -1,7 +1,7 @@
 # Canny Edge Detector
 
 ## Reference
-- https://rosettacode.org/wiki/Canny_edge_detector
+- http://oomusou.cnblogs.com
 
 ## SystemC Simulation
 

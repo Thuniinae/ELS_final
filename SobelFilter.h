@@ -3,12 +3,7 @@
 #include <systemc>
 using namespace sc_core;
 
-#define MASK_N 2
-#define MASK_X 3
-#define MASK_Y 3
-#define WHITE 255
-#define BLACK 0
-#define THRESHOLD 90
+#include "filter_def.h"
 
 class SobelFilter: public sc_module
 {

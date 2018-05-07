@@ -1,4 +1,6 @@
+#include <cmath>
 #include "SobelFilter.h"
+
 SobelFilter::SobelFilter( sc_module_name n ): sc_module( n )
 {
 	SC_THREAD( do_filter );
@@ -41,11 +43,12 @@ void SobelFilter::do_filter() {
 				}
 			}
 		}
-		int total = 0;
+		double total = 0;
 		for (unsigned int i = 0; i != MASK_N; ++i) {
 			total += val[i] * val[i];
 			wait();
 		}
-		o_result.write(sqrt(total));
+		int result = (int)(std::sqrt(total));
+		o_result.write(result);
 	}
 }

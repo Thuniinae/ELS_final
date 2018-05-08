@@ -21,8 +21,6 @@ int sc_main(int argc, char **argv) {
          << endl;
     return 0;
   }
-  cout << "Starting Simulation" << endl;
-
   Testbench tb("tb");
 	SobelFilter sobel_filter("sobel_filter");
 	sc_clock clk( "clk", CLOCK_PERIOD, SC_NS );
@@ -46,7 +44,7 @@ int sc_main(int argc, char **argv) {
 
   tb.read_bmp(argv[1]);
 	sc_start();
-	std::cout<< sc_core::sc_time_stamp() << std::endl;
+	std::cout<< "Simulated time == " << sc_core::sc_time_stamp() << std::endl;
   tb.write_bmp(argv[2]);
 
   return 0;

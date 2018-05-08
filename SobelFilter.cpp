@@ -1,18 +1,9 @@
 #include <cmath>
-#ifndef NATIVE_SYSTEMC
-#include "stratus_hls.h"
-#endif
 
 #include "SobelFilter.h"
 
 SobelFilter::SobelFilter( sc_module_name n ): sc_module( n )
 {
-#ifndef NATIVE_SYSTEMC
-	HLS_FLATTEN_ARRAY(rSpace);
-	HLS_FLATTEN_ARRAY(gSpace);
-	HLS_FLATTEN_ARRAY(bSpace);
-	HLS_FLATTEN_ARRAY(val);
-#endif
 	SC_THREAD( do_filter );
 	sensitive << i_clk.pos();
 	dont_initialize();
@@ -30,9 +21,6 @@ int color_to_int(int r, int g, int b) { return (r + g + b) / 3; }
 
 void SobelFilter::do_filter() {
 	{
-#ifndef NATIVE_SYSTEMC
-		HLS_DEFINE_PROTOCOL("main_reset");
-#endif
 		wait();
 	}
 	while (true) {

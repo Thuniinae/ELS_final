@@ -5,8 +5,7 @@ using namespace std;
 // Wall Clock Time Measurement
 #include <sys/time.h>
 
-#include "Testbench.h"
-#include "SobelFilter.h"
+#include "System.h"
 
 // TIMEVAL STRUCT IS Defined ctime
 // use start_time and end_time variables to capture
@@ -21,31 +20,10 @@ int sc_main(int argc, char **argv) {
          << endl;
     return 0;
   }
-  Testbench tb("tb");
-	SobelFilter sobel_filter("sobel_filter");
-	sc_clock clk( "clk", CLOCK_PERIOD, SC_NS );
-	sc_signal<bool> rst("rst");
-	sc_fifo<unsigned char> r;
-	sc_fifo<unsigned char> g;
-	sc_fifo<unsigned char> b;
-	sc_fifo<int> result;
-	tb.i_clk(clk);
-	tb.o_rst(rst);
-	sobel_filter.i_clk(clk);
-	sobel_filter.i_rst(rst);
-	tb.o_r(r);
-	tb.o_g(g);
-	tb.o_b(b);
-	tb.i_result(result);
-	sobel_filter.i_r(r);
-	sobel_filter.i_g(g);
-	sobel_filter.i_b(b);
-	sobel_filter.o_result(result);
-
-  tb.read_bmp(argv[1]);
+	System sys("sys", argv[1], argv[2]);
+	
 	sc_start();
 	std::cout<< "Simulated time == " << sc_core::sc_time_stamp() << std::endl;
-  tb.write_bmp(argv[2]);
 
   return 0;
 }

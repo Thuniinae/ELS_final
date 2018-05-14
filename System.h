@@ -17,8 +17,13 @@ private:
 	SobelFilter sobel_filter;
 	sc_clock clk;
 	sc_signal<bool> rst;
-	cynw_p2p< sc_uint<24> > rgb;
-	cynw_p2p< sc_uint<32> > result;
+#ifndef NATIVE_SYSTEMC
+	cynw_p2p< sc_dt::sc_uint<24> > rgb;
+	cynw_p2p< sc_dt::sc_uint<32> > result;
+#else
+	sc_fifo< sc_dt::sc_uint<24> > rgb;
+	sc_fifo< sc_dt::sc_uint<32> > result;
+#endif
 
 	std::string _output_bmp;
 };

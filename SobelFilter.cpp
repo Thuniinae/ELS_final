@@ -18,8 +18,10 @@ SobelFilter::SobelFilter( sc_module_name n ): sc_module( n )
 	dont_initialize();
 	reset_signal_is(i_rst, false);
         
+#ifndef NATIVE_SYSTEMC
 	i_rgb.clk_rst(i_clk, i_rst);
   o_result.clk_rst(i_clk, i_rst);
+#endif
 }
 
 SobelFilter::~SobelFilter() {}
@@ -35,18 +37,22 @@ void SobelFilter::do_filter() {
 	{
 #ifndef NATIVE_SYSTEMC
 		HLS_DEFINE_PROTOCOL("main_reset");
-#endif
 		i_rgb.reset();
 		o_result.reset();
+#endif
 		wait();
 	}
 	while (true) {
 		for (unsigned int v = 0; v<MASK_Y; ++v) {
 			for (unsigned int u = 0; u<MASK_X; ++u) {
-				sc_uint<24> rgb = i_rgb.get();
-				rSpace[u][v] = rgb.range(0, 7);
-				gSpace[u][v] = rgb.range(8, 15);
-				bSpace[u][v] = rgb.range(16, 23);
+#ifndef NATIVE_SYSTEMC
+				sc_dt::sc_uint<24> rgb = i_rgb.get();
+#else
+				sc_dt::sc_uint<24> rgb = i_rgb.read();
+#endif
+				rSpace[u][v] = rgb.range(7, 0);
+				gSpace[u][v] = rgb.range(15, 8);
+				bSpace[u][v] = rgb.range(23, 16);
 				wait();
 			}
 		}
@@ -68,6 +74,10 @@ void SobelFilter::do_filter() {
 			wait();
 		}
 		int result = (int)(std::sqrt(total));
+#ifndef NATIVE_SYSTEMC
 		o_result.put(result);
+#else
+		o_result.write(result);
+#endif
 	}
 }

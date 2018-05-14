@@ -171,8 +171,9 @@ void Testbench::do_sobel() {
 #else
 			total = i_result.read();
 #endif
+			int result = (int)(std::sqrt(total));
 
-      if (total - THRESHOLD >= 0) {
+      if (result - THRESHOLD >= 0) {
         // black
         *(target_bitmap + bytes_per_pixel * (width * y + x) + 2) = BLACK;
         *(target_bitmap + bytes_per_pixel * (width * y + x) + 1) = BLACK;

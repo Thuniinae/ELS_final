@@ -68,16 +68,15 @@ void SobelFilter::do_filter() {
 				}
 			}
 		}
-		float total = 0;
+		int total = 0;
 		for (unsigned int i = 0; i != MASK_N; ++i) {
 			total += val[i] * val[i];
 			wait();
 		}
-		int result = (int)(std::sqrt(total));
 #ifndef NATIVE_SYSTEMC
-		o_result.put(result);
+		o_result.put(total);
 #else
-		o_result.write(result);
+		o_result.write(total);
 #endif
 	}
 }

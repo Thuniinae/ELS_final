@@ -4,7 +4,11 @@
 using namespace sc_core;
 
 #include "Testbench.h"
+#ifndef NATIVE_SYSTEMC
+#include "SobelFilter_wrap.h"
+#else
 #include "SobelFilter.h"
+#endif
 
 class System: public sc_module
 {
@@ -14,7 +18,11 @@ public:
 	~System();
 private:
   Testbench tb;
+#ifndef NATIVE_SYSTEMC
+	SobelFilter_wrapper sobel_filter;
+#else
 	SobelFilter sobel_filter;
+#endif
 	sc_clock clk;
 	sc_signal<bool> rst;
 #ifndef NATIVE_SYSTEMC

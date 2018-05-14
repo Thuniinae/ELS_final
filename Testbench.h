@@ -7,6 +7,8 @@ using namespace std;
 #include <systemc>
 using namespace sc_core;
 
+#include <cynw_p2p.h>
+
 #include "filter_def.h"
 
 #define WHITE 255
@@ -17,10 +19,8 @@ class Testbench : public sc_module {
 public:
 	sc_in_clk i_clk;
 	sc_out < bool >  o_rst;
-	sc_fifo_out< unsigned char > o_r;
-	sc_fifo_out< unsigned char > o_g;
-	sc_fifo_out< unsigned char > o_b;
-	sc_fifo_in< int > i_result;
+	cynw_p2p< sc_uint<24> >::base_out o_rgb;
+	cynw_p2p< sc_uint<32> >::base_in i_result;
 
   SC_HAS_PROCESS(Testbench);
 

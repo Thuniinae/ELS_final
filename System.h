@@ -17,10 +17,8 @@ private:
 	SobelFilter sobel_filter;
 	sc_clock clk;
 	sc_signal<bool> rst;
-	sc_fifo<unsigned char> r;
-	sc_fifo<unsigned char> g;
-	sc_fifo<unsigned char> b;
-	sc_fifo<int> result;
+	cynw_p2p< sc_uint<24> > rgb;
+	cynw_p2p< sc_uint<32> > result;
 
 	std::string _output_bmp;
 };

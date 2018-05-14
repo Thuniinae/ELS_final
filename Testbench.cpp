@@ -125,6 +125,8 @@ void Testbench::do_sobel() {
   int adjustX, adjustY, xBound, yBound;
   int total;
 
+	o_rgb.reset();
+	i_result.reset();
 	o_rst.write(false);
 	wait(5);
 	o_rst.write(true);
@@ -150,13 +152,15 @@ void Testbench::do_sobel() {
 						G = 0;
 						B = 0;
 					}
-					o_r.write(R);
-					o_g.write(G);
-					o_b.write(B);
+					sc_uint<24> rgb;
+					rgb.range(0, 7) = R;
+					rgb.range(8, 15) = G;
+					rgb.range(16, 23) = B;
+					o_rgb.put(rgb);
         }
       }
 
-			total = i_result.read();
+			total = i_result.get();
 
       if (total - THRESHOLD >= 0) {
         // black

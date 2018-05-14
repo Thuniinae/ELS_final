@@ -17,6 +17,9 @@ SobelFilter::SobelFilter( sc_module_name n ): sc_module( n )
 	sensitive << i_clk.pos();
 	dont_initialize();
 	reset_signal_is(i_rst, false);
+        
+	i_rgb.clk_rst(i_clk, i_rst);
+  o_result.clk_rst(i_clk, i_rst);
 }
 
 SobelFilter::~SobelFilter() {}
@@ -33,14 +36,17 @@ void SobelFilter::do_filter() {
 #ifndef NATIVE_SYSTEMC
 		HLS_DEFINE_PROTOCOL("main_reset");
 #endif
+		i_rgb.reset();
+		o_result.reset();
 		wait();
 	}
 	while (true) {
 		for (unsigned int v = 0; v<MASK_Y; ++v) {
 			for (unsigned int u = 0; u<MASK_X; ++u) {
-				rSpace[u][v] = i_r.read();
-				gSpace[u][v] = i_g.read();
-				bSpace[u][v] = i_b.read();
+				sc_uint<24> rgb = i_rgb.get();
+				rSpace[u][v] = rgb.range(0, 7);
+				gSpace[u][v] = rgb.range(8, 15);
+				bSpace[u][v] = rgb.range(16, 23);
 				wait();
 			}
 		}
@@ -56,12 +62,12 @@ void SobelFilter::do_filter() {
 				}
 			}
 		}
-		double total = 0;
+		float total = 0;
 		for (unsigned int i = 0; i != MASK_N; ++i) {
 			total += val[i] * val[i];
 			wait();
 		}
 		int result = (int)(std::sqrt(total));
-		o_result.write(result);
+		o_result.put(result);
 	}
 }

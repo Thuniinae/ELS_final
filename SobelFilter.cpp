@@ -31,8 +31,6 @@ const int mask[MASK_N][MASK_X][MASK_Y] = {{{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}},
 
                                     {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}}};
 
-int color_to_int(int r, int g, int b) { return (r + g + b) / 3; }
-
 void SobelFilter::do_filter() {
 	{
 #ifndef NATIVE_SYSTEMC
@@ -50,9 +48,7 @@ void SobelFilter::do_filter() {
 #else
 				sc_dt::sc_uint<24> rgb = i_rgb.read();
 #endif
-				rSpace[u][v] = rgb.range(7, 0);
-				gSpace[u][v] = rgb.range(15, 8);
-				bSpace[u][v] = rgb.range(23, 16);
+				greyscale[u][v] = (rgb.range(7,0) + rgb.range(15,8) + rgb.range(23, 16))/3;
 				wait();
 			}
 		}
@@ -63,7 +59,7 @@ void SobelFilter::do_filter() {
 		for (unsigned int v = 0; v<MASK_Y; ++v) {
 			for (unsigned int u = 0; u<MASK_X; ++u) {
 				for (unsigned int i = 0; i != MASK_N; ++i) {
-					val[i] += color_to_int(rSpace[u][v], gSpace[u][v], bSpace[u][v]) * mask[i][u][v];
+					val[i] += greyscale[u][v] * mask[i][u][v];
 					wait();
 				}
 			}

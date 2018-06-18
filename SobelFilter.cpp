@@ -41,6 +41,10 @@ void SobelFilter::do_filter() {
 		wait();
 	}
 	while (true) {
+		for (unsigned int i = 0; i<MASK_N; ++i) {
+			val[i] = 0;
+			wait();
+		}
 		for (unsigned int v = 0; v<MASK_Y; ++v) {
 			for (unsigned int u = 0; u<MASK_X; ++u) {
 #ifndef NATIVE_SYSTEMC
@@ -49,15 +53,6 @@ void SobelFilter::do_filter() {
 				sc_dt::sc_uint<24> rgb = i_rgb.read();
 #endif
 				greyscale[u][v] = (rgb.range(7,0) + rgb.range(15,8) + rgb.range(23, 16))/3;
-				wait();
-			}
-		}
-		for (unsigned int i = 0; i<MASK_N; ++i) {
-			val[i] = 0;
-			wait();
-		}
-		for (unsigned int v = 0; v<MASK_Y; ++v) {
-			for (unsigned int u = 0; u<MASK_X; ++u) {
 				for (unsigned int i = 0; i != MASK_N; ++i) {
 					val[i] += greyscale[u][v] * mask[i][u][v];
 					wait();

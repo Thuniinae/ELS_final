@@ -35,6 +35,7 @@ LIB_DIRS += -L$(SYSTEMC_HOME)/$(SYSTEMC_LIB)
 
 ### Definitions ###
 executives=sobel
+output=out.bmp
 sources= main.cpp Testbench.cpp SobelFilter.cpp System.cpp
 objects= $(subst .cpp,.o,$(sources))
 dependencies= $(subst .cpp,.d,$(sources))
@@ -53,7 +54,11 @@ $(objects):%.o:%.cpp
 ### phony ###
 run: sobel
 	./sobel lena_std_short.bmp out.bmp
-	diff out.bmp golden/lena_std_short_sobel.bmp
+
+${output}: run
+
+check: ${output}
+	diff ${output} golden/lena_std_short_sobel.bmp
 
 clean: 
-	rm -f $(executives) $(objects) $(dependencies) $(COMPILER_ERROR) $(LINKER_ERROR)
+	rm -f $(executives) $(objects) $(dependencies) $(COMPILER_ERROR) $(LINKER_ERROR) ${output}

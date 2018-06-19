@@ -8,7 +8,6 @@
 SobelFilter::SobelFilter( sc_module_name n ): sc_module( n )
 {
 #ifndef NATIVE_SYSTEMC
-	HLS_FLATTEN_ARRAY(greyscale);
 	HLS_FLATTEN_ARRAY(val);
 #endif
 	SC_THREAD( do_filter );
@@ -50,9 +49,10 @@ void SobelFilter::do_filter() {
 #else
 				sc_dt::sc_uint<24> rgb = i_rgb.read();
 #endif
-				greyscale[u][v] = (rgb.range(7,0) + rgb.range(15,8) + rgb.range(23, 16))/3;
+				unsigned char grey = (rgb.range(7,0) + rgb.range(15,8) + rgb.range(23, 16))/3;
+				wait();
 				for (unsigned int i = 0; i != MASK_N; ++i) {
-					val[i] += greyscale[u][v] * mask[i][u][v];
+					val[i] += grey * mask[i][u][v];
 					wait();
 				}
 			}

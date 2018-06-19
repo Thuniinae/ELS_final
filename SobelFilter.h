@@ -27,7 +27,6 @@ public:
 	~SobelFilter();
 private:
 	void do_filter();
-	unsigned char greyscale[MASK_X][MASK_Y];
   int val[MASK_N];
 };
 #endif

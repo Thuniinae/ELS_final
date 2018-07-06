@@ -57,6 +57,12 @@ private:
   unsigned short bytes_per_pixel;
   unsigned char *source_bitmap;
   unsigned char *target_bitmap;
+	
+	unsigned int n_txn;
+	sc_time max_txn_time;
+	sc_time min_txn_time;
+	sc_time total_txn_time;
+	sc_time total_run_time;
 
   void do_sobel();
 };

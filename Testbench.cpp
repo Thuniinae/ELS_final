@@ -25,15 +25,18 @@ unsigned char header[54] = {
 };
 
 Testbench::Testbench(sc_module_name n) : sc_module(n) {
-  SC_THREAD(do_sobel);
+  SC_THREAD(feed_rgb);
+  sensitive << i_clk.pos();
+  dont_initialize();
+  SC_THREAD(fetch_result);
   sensitive << i_clk.pos();
   dont_initialize();
 }
 
 Testbench::~Testbench() {
-	cout<< "Max txn time = " << max_txn_time << endl;
-	cout<< "Min txn time = " << min_txn_time << endl;
-	cout<< "Avg txn time = " << total_txn_time/n_txn << endl;
+	//cout<< "Max txn time = " << max_txn_time << endl;
+	//cout<< "Min txn time = " << min_txn_time << endl;
+	//cout<< "Avg txn time = " << total_txn_time/n_txn << endl;
 	cout << "Total run time = " << total_run_time << endl;
 }
 
@@ -124,13 +127,10 @@ int Testbench::write_bmp(string outfile_name) {
   return 0;
 }
 
-void Testbench::do_sobel() {
+void Testbench::feed_rgb() {
   unsigned int x, y, i, v, u; // for loop counter
   unsigned char R, G, B;      // color of R, G, B
   int adjustX, adjustY, xBound, yBound;
-  int total;
-	sc_time txn_start_time;
-	sc_time total_start_time;
 	n_txn = 0;
 	max_txn_time = SC_ZERO_TIME;
 	min_txn_time = SC_ZERO_TIME;
@@ -138,7 +138,6 @@ void Testbench::do_sobel() {
 
 #ifndef NATIVE_SYSTEMC
 	o_rgb.reset();
-	i_result.reset();
 #endif
 	o_rst.write(false);
 	wait(5);
@@ -152,7 +151,6 @@ void Testbench::do_sobel() {
       xBound = MASK_X / 2;            // 1
       yBound = MASK_Y / 2;            // 1
 
-			txn_start_time = sc_time_stamp();
       for (v = -yBound; v != yBound + adjustY; ++v) {   //-1, 0, 1
         for (u = -xBound; u != xBound + adjustX; ++u) { //-1, 0, 1
           if (x + u >= 0 && x + u < width && y + v >= 0 && y + v < height) {
@@ -179,32 +177,25 @@ void Testbench::do_sobel() {
 #endif
         }
       }
+    }
+  }
+}
 
+void Testbench::fetch_result() {
+  unsigned int x, y; // for loop counter
+  int total;
+#ifndef NATIVE_SYSTEMC
+	i_result.reset();
+#endif
+	wait(5);
+	wait(1);
+  for (y = 0; y != height; ++y) {
+    for (x = 0; x != width; ++x) {
 #ifndef NATIVE_SYSTEMC
 			total = i_result.get();
 #else
 			total = i_result.read();
 #endif
-			sc_time txn_time = sc_time_stamp() - txn_start_time;
-			if (max_txn_time == SC_ZERO_TIME) {
-				max_txn_time = txn_time;
-			}
-			else {
-				if (max_txn_time < txn_time) {
-					max_txn_time = txn_time;
-				}
-			}
-			if (min_txn_time == SC_ZERO_TIME) {
-				min_txn_time = txn_time;
-			}
-			else {
-				if (min_txn_time > txn_time) {
-					min_txn_time = txn_time;
-				}
-			}
-			total_txn_time += txn_time;
-			n_txn++;
-			//cout<< n_txn << ": " << txn_time << endl;
 			int result = (int)(std::sqrt(total));
 
       if (result - THRESHOLD >= 0) {

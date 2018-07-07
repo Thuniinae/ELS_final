@@ -62,8 +62,10 @@ private:
 	sc_time max_txn_time;
 	sc_time min_txn_time;
 	sc_time total_txn_time;
+	sc_time total_start_time;
 	sc_time total_run_time;
 
-  void do_sobel();
+  void feed_rgb();
+	void fetch_result();
 };
 #endif

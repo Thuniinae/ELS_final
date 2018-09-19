@@ -1,7 +1,4 @@
-# Canny Edge Detector
-
-## Reference
-- http://oomusou.cnblogs.com
+# Sobel Edge Detector
 
 ## SystemC Simulation
 

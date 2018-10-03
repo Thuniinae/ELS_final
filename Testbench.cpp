@@ -24,7 +24,7 @@ unsigned char header[54] = {
     0,    0, 0, 0  // important colors
 };
 
-Testbench::Testbench(sc_module_name n) : sc_module(n) {
+Testbench::Testbench(sc_module_name n) : sc_module(n), output_rgb_raw_data_offset(54) {
   SC_THREAD(feed_rgb);
   sensitive << i_clk.pos();
   dont_initialize();
@@ -49,7 +49,7 @@ int Testbench::read_bmp(string infile_name) {
   }
   // move offset to 10 to find rgb raw data offset
   fseek(fp_s, 10, SEEK_SET);
-  fread(&rgb_raw_data_offset, sizeof(unsigned int), 1, fp_s);
+  fread(&input_rgb_raw_data_offset, sizeof(unsigned int), 1, fp_s);
 
   // move offset to 18 to get width & height;
   fseek(fp_s, 18, SEEK_SET);
@@ -61,8 +61,8 @@ int Testbench::read_bmp(string infile_name) {
   fread(&bits_per_pixel, sizeof(unsigned short), 1, fp_s);
   bytes_per_pixel = bits_per_pixel / 8;
 
-  // move offset to rgb_raw_data_offset to get RGB raw data
-  fseek(fp_s, rgb_raw_data_offset, SEEK_SET);
+  // move offset to input_rgb_raw_data_offset to get RGB raw data
+  fseek(fp_s, input_rgb_raw_data_offset, SEEK_SET);
 
   source_bitmap =
       (unsigned char *)malloc((size_t)width * height * bytes_per_pixel);
@@ -95,7 +95,7 @@ int Testbench::write_bmp(string outfile_name) {
   }
 
   // file size
-  file_size = width * height * bytes_per_pixel + rgb_raw_data_offset;
+  file_size = width * height * bytes_per_pixel + output_rgb_raw_data_offset;
   header[2] = (unsigned char)(file_size & 0x000000ff);
   header[3] = (file_size >> 8) & 0x000000ff;
   header[4] = (file_size >> 16) & 0x000000ff;
@@ -117,7 +117,7 @@ int Testbench::write_bmp(string outfile_name) {
   header[28] = bits_per_pixel;
 
   // write header
-  fwrite(header, sizeof(unsigned char), rgb_raw_data_offset, fp_t);
+  fwrite(header, sizeof(unsigned char), output_rgb_raw_data_offset, fp_t);
 
   // write image
   fwrite(target_bitmap, sizeof(unsigned char),

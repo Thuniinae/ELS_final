@@ -49,7 +49,8 @@ public:
   unsigned char *get_target_image() { return target_bitmap; }
 
 private:
-  unsigned int rgb_raw_data_offset;
+  unsigned int input_rgb_raw_data_offset;
+  const unsigned int output_rgb_raw_data_offset;
   unsigned int width;
   unsigned int height;
   unsigned int width_bytes;

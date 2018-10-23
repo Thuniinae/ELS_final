@@ -39,31 +39,39 @@ void SobelFilter::do_filter() {
 	}
 	while (true) {
 		for (unsigned int i = 0; i<MASK_N; ++i) {
+			HLS_CONSTRAIN_LATENCY(0, 1, "lat00");
 			val[i] = 0;
-			wait();
 		}
 		for (unsigned int v = 0; v<MASK_Y; ++v) {
 			for (unsigned int u = 0; u<MASK_X; ++u) {
+				sc_dt::sc_uint<24> rgb;
 #ifndef NATIVE_SYSTEMC
-				sc_dt::sc_uint<24> rgb = i_rgb.get();
+				{
+					HLS_DEFINE_PROTOCOL("input");
+					rgb = i_rgb.get();
+					wait();
+				}
 #else
-				sc_dt::sc_uint<24> rgb = i_rgb.read();
+				rgb = i_rgb.read();
 #endif
 				unsigned char grey = (rgb.range(7,0) + rgb.range(15,8) + rgb.range(23, 16))/3;
-				wait();
 				for (unsigned int i = 0; i != MASK_N; ++i) {
+					HLS_CONSTRAIN_LATENCY(0, 1, "lat01");
 					val[i] += grey * mask[i][u][v];
-					wait();
 				}
 			}
 		}
 		int total = 0;
 		for (unsigned int i = 0; i != MASK_N; ++i) {
+			HLS_CONSTRAIN_LATENCY(0, 1, "lat01");
 			total += val[i] * val[i];
-			wait();
 		}
 #ifndef NATIVE_SYSTEMC
-		o_result.put(total);
+		{
+			HLS_DEFINE_PROTOCOL("output");
+			o_result.put(total);
+			wait();
+		}
 #else
 		o_result.write(total);
 #endif

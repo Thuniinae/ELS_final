@@ -2,5 +2,7 @@
 *.o
 sobel
 canny
-
 out.bmp
+**/build/
+test/
+.vscode/

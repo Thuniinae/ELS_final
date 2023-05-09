@@ -39,7 +39,9 @@ void SobelFilter::do_filter() {
 	}
 	while (true) {
 		for (unsigned int i = 0; i<MASK_N; ++i) {
+#ifndef NATIVE_SYSTEMC
 			HLS_CONSTRAIN_LATENCY(0, 1, "lat00");
+#endif
 			val[i] = 0;
 		}
 		for (unsigned int v = 0; v<MASK_Y; ++v) {
@@ -56,14 +58,18 @@ void SobelFilter::do_filter() {
 #endif
 				unsigned char grey = (rgb.range(7,0) + rgb.range(15,8) + rgb.range(23, 16))/3;
 				for (unsigned int i = 0; i != MASK_N; ++i) {
+#ifndef NATIVE_SYSTEMC
 					HLS_CONSTRAIN_LATENCY(0, 1, "lat01");
+#endif
 					val[i] += grey * mask[i][u][v];
 				}
 			}
 		}
 		int total = 0;
 		for (unsigned int i = 0; i != MASK_N; ++i) {
+#ifndef NATIVE_SYSTEMC
 			HLS_CONSTRAIN_LATENCY(0, 1, "lat01");
+#endif
 			total += val[i] * val[i];
 		}
 #ifndef NATIVE_SYSTEMC

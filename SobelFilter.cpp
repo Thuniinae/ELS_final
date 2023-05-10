@@ -4,27 +4,38 @@
 #endif
 
 #include "SobelFilter.h"
-void selectionSort(unsigned char* A, int n){
 
-    int j;            
-    unsigned char t;  // temporary variable for swapping
-
-    for (int i = 0; i < n - 1; i++){  // iterate from 0 to n-1
-        j = i;
-        for (int k = i + 1; k < n; k++){
+unsigned char Median(unsigned char *A, unsigned int n){
+    
+    for (unsigned int i = 0; i <= n / 2; i++){
+		unsigned char temp;
+    	unsigned int index;
+		{
 #ifndef NATIVE_SYSTEMC
-			HLS_CONSTRAIN_LATENCY(0, 2, "lats0");
+			HLS_CONSTRAIN_LATENCY(0, 2, "latM0");
 #endif
-            if (A[k] < A[j]) j = k;  // store current smallest element index in j
+        temp = A[i];
+        index = i;
+		}
+        for (unsigned int j = i + 1; j < n; j++){
+#ifndef NATIVE_SYSTEMC
+			HLS_CONSTRAIN_LATENCY(0, 3, "latM1");
+#endif
+            if (temp < A[j]){
+                temp = A[j];
+                index = j;
+            }
         }
 		{
 #ifndef NATIVE_SYSTEMC
-			HLS_CONSTRAIN_LATENCY(0, 4, "lats1");
+			HLS_CONSTRAIN_LATENCY(0, 2, "latM2");
 #endif
-        t = A[i]; A[i] = A[j]; A[j] = t;  // swap A[i] and A[j]
+        A[index] = A[i];
+        A[i] = temp;
 		}
     }
-} 
+    return A[n / 2];
+}
 
 SobelFilter::SobelFilter( sc_module_name n ): sc_module( n )
 {
@@ -150,16 +161,17 @@ void SobelFilter::do_filter() {
 					}
 				}
 				for (int k = 0; k < 3; k++){  // iterate R/G/B
-					selectionSort(mdWin[k], MASK_X * MASK_Y);  // median filter
+					unsigned char med;
+					med = Median(mdWin[k], MASK_X * MASK_Y);  // median filter
 					{
 #ifndef NATIVE_SYSTEMC
 					HLS_CONSTRAIN_LATENCY(0, 5, "lat07");
 #endif
 					if (i == 1 && j==1)  // weighted mean filter
 					{
-						mean[k] += mdWin[k][int(MASK_X * MASK_Y / 2)]*2 / 10;  // centered pixel
+						mean[k] += med / 5;  // centered pixel
 					}else{
-						mean[k] += mdWin[k][int(MASK_X * MASK_Y / 2)] / 10;  // other pixels
+						mean[k] += med / 10;  // other pixels
 					}
 					}
 				}

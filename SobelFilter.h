@@ -16,7 +16,7 @@ public:
 	sc_in < bool >  i_rst;
 #ifndef NATIVE_SYSTEMC
 	cynw_p2p< sc_dt::sc_uint<24> >::in i_rgb;
-	cynw_p2p< sc_dt::sc_uint<32> >::out o_result;
+	cynw_p2p< sc_dt::sc_uint<24> >::out o_result;
 #else
 	sc_fifo_in< sc_dt::sc_uint<24> > i_rgb;
 	sc_fifo_out< sc_dt::sc_uint<32> > o_result;
@@ -27,6 +27,5 @@ public:
 	~SobelFilter();
 private:
 	void do_filter();
-  int val[MASK_N];
 };
 #endif

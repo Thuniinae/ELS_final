@@ -23,10 +23,10 @@ public:
 	sc_out < bool >  o_rst;
 #ifndef NATIVE_SYSTEMC
 	cynw_p2p< sc_dt::sc_uint<24> >::base_out o_rgb;
-	cynw_p2p< sc_dt::sc_uint<32> >::base_in i_result;
+	cynw_p2p< sc_dt::sc_uint<24> >::base_in i_result;
 #else
 	sc_fifo_out< sc_dt::sc_uint<24> > o_rgb;
-	sc_fifo_in< sc_dt::sc_uint<32> > i_result;
+	sc_fifo_in< sc_dt::sc_uint<24> > i_result;
 #endif
 
   SC_HAS_PROCESS(Testbench);

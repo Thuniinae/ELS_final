@@ -128,7 +128,7 @@ int Testbench::write_bmp(string outfile_name) {
 }
 
 void Testbench::feed_rgb() {
-  unsigned int x, y, i, v, u; // for loop counter
+  int x, y, i, v, u, j; // for loop counter
   unsigned char R, G, B;      // color of R, G, B
   int adjustX, adjustY, xBound, yBound;
 	n_txn = 0;
@@ -150,31 +150,32 @@ void Testbench::feed_rgb() {
       adjustY = (MASK_Y % 2) ? 1 : 0; // 1
       xBound = MASK_X / 2;            // 1
       yBound = MASK_Y / 2;            // 1
-
-      for (v = -yBound; v != yBound + adjustY; ++v) {   //-1, 0, 1
-        for (u = -xBound; u != xBound + adjustX; ++u) { //-1, 0, 1
-          if (x + u >= 0 && x + u < width && y + v >= 0 && y + v < height) {
-            R = *(source_bitmap +
-                  bytes_per_pixel * (width * (y + v) + (x + u)) + 2);
-            G = *(source_bitmap +
-                  bytes_per_pixel * (width * (y + v) + (x + u)) + 1);
-            B = *(source_bitmap +
-                  bytes_per_pixel * (width * (y + v) + (x + u)) + 0);
-          }
-					else {
-						R = 0;
-						G = 0;
-						B = 0;
-					}
-					sc_dt::sc_uint<24> rgb;
-					rgb.range(7, 0) = R;
-					rgb.range(15, 8) = G;
-					rgb.range(23, 16) = B;
+      for (v = y - 1; v <= y + 1; v++) {
+        for (u = x - 2; u <= x + 2; u++) {
+          for (j = v - 1; j <= v + 1; j++) {
+            if (u >= 0 && u < width && j >= 0 && j < height) {
+                R = *(source_bitmap +
+                      bytes_per_pixel * (width * j + u) + 2);
+                G = *(source_bitmap +
+                      bytes_per_pixel * (width * j + u) + 1);
+                B = *(source_bitmap +
+                      bytes_per_pixel * (width * j + u) + 0);
+              } else {
+                R = 0;
+                G = 0;
+                B = 0;
+              }
+              sc_dt::sc_uint<24> rgb;
+              rgb.range(7, 0) = R;
+              rgb.range(15, 8) = G;
+              rgb.range(23, 16) = B;
 #ifndef NATIVE_SYSTEMC
-					o_rgb.put(rgb);
+              o_rgb.put(rgb);
 #else
-					o_rgb.write(rgb);
+              o_rgb.write(rgb);
+              wait(1); //emulate channel delay
 #endif
+          }
         }
       }
     }
@@ -184,33 +185,33 @@ void Testbench::feed_rgb() {
 void Testbench::fetch_result() {
   unsigned int x, y; // for loop counter
   int total;
+  unsigned char R, G, B;      // color of R, G, B
 #ifndef NATIVE_SYSTEMC
 	i_result.reset();
 #endif
 	wait(5);
 	wait(1);
+
   for (y = 0; y != height; ++y) {
     for (x = 0; x != width; ++x) {
 #ifndef NATIVE_SYSTEMC
-			total = i_result.get();
+      R = i_result.get();
+      G = i_result.get();
+      B = i_result.get();
 #else
-			total = i_result.read();
+      R = i_result.read();
+      G = i_result.read();
+      B = i_result.read();
 #endif
-			int result = (int)(std::sqrt(total));
-
-      if (result - THRESHOLD >= 0) {
-        // black
-        *(target_bitmap + bytes_per_pixel * (width * y + x) + 2) = BLACK;
-        *(target_bitmap + bytes_per_pixel * (width * y + x) + 1) = BLACK;
-        *(target_bitmap + bytes_per_pixel * (width * y + x) + 0) = BLACK;
-      } else {
-        // white
-        *(target_bitmap + bytes_per_pixel * (width * y + x) + 2) = WHITE;
-        *(target_bitmap + bytes_per_pixel * (width * y + x) + 1) = WHITE;
-        *(target_bitmap + bytes_per_pixel * (width * y + x) + 0) = WHITE;
-      }
+      *(target_bitmap + bytes_per_pixel * (width * y + x) + 2) = R;
+      *(target_bitmap + bytes_per_pixel * (width * y + x) + 1) = G;
+      *(target_bitmap + bytes_per_pixel * (width * y + x) + 0) = B;
+      //cout << "Now at " << sc_time_stamp() << endl; //print current sc_time
     }
   }
+  cout << "R: " << (int)R << endl;
+  cout << "G: " << (int)G << endl;
+  cout << "B: " << (int)B << endl;
 	total_run_time = sc_time_stamp() - total_start_time;
   sc_stop();
 }

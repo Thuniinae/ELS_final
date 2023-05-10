@@ -186,6 +186,7 @@ void Testbench::fetch_result() {
   unsigned int x, y; // for loop counter
   int total;
   unsigned char R, G, B;      // color of R, G, B
+  int cnt = 0;
 #ifndef NATIVE_SYSTEMC
 	i_result.reset();
 #endif
@@ -194,19 +195,23 @@ void Testbench::fetch_result() {
 
   for (y = 0; y != height; ++y) {
     for (x = 0; x != width; ++x) {
+      sc_dt::sc_uint<24> rgb;
 #ifndef NATIVE_SYSTEMC
-      R = i_result.get();
-      G = i_result.get();
-      B = i_result.get();
+      rgb = i_result.get();
+      
 #else
-      R = i_result.read();
-      G = i_result.read();
-      B = i_result.read();
+      rgb = i_result.read();
 #endif
+      R = rgb.range(7, 0);
+      G = rgb.range(15, 8);
+      B = rgb.range(23, 16);
       *(target_bitmap + bytes_per_pixel * (width * y + x) + 2) = R;
       *(target_bitmap + bytes_per_pixel * (width * y + x) + 1) = G;
       *(target_bitmap + bytes_per_pixel * (width * y + x) + 0) = B;
-      //cout << "Now at " << sc_time_stamp() << endl; //print current sc_time
+      if (cnt % 1000 == 0){
+        std::cout << "Now at " << sc_time_stamp() << std::endl; //print current sc_time
+      }
+      cnt++;
     }
   }
   cout << "R: " << (int)R << endl;

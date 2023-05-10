@@ -39,9 +39,6 @@ unsigned char Median(unsigned char *A, unsigned int n){
 
 SobelFilter::SobelFilter( sc_module_name n ): sc_module( n )
 {
-#ifndef NATIVE_SYSTEMC
-	HLS_FLATTEN_ARRAY(val);
-#endif
 	SC_THREAD( do_filter );
 	sensitive << i_clk.pos();
 	dont_initialize();
@@ -54,11 +51,6 @@ SobelFilter::SobelFilter( sc_module_name n ): sc_module( n )
 }
 
 SobelFilter::~SobelFilter() {}
-
-// sobel mask
-const int mask[MASK_N][MASK_X][MASK_Y] = {{{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}},
-
-                                    {{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}}};
 
 void SobelFilter::do_filter() {
 	unsigned char mdWin[3][MASK_X * MASK_Y];  // median filter window of size MASK_X x MASK_Y

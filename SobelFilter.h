@@ -19,7 +19,7 @@ public:
 	cynw_p2p< sc_dt::sc_uint<24> >::out o_result;
 #else
 	sc_fifo_in< sc_dt::sc_uint<24> > i_rgb;
-	sc_fifo_out< sc_dt::sc_uint<32> > o_result;
+	sc_fifo_out< sc_dt::sc_uint<24> > o_result;
 #endif
 
 	SC_HAS_PROCESS( SobelFilter );
@@ -27,5 +27,8 @@ public:
 	~SobelFilter();
 private:
 	void do_filter();
+	unsigned char mdWin[3][MASK_X * MASK_Y];  // median filter window of size MASK_X x MASK_Y
+	int mean[3];  // mean filter result of R/G/B
+	unsigned char buffer[3][BUF_X][BUF_Y];  //buffer of R/G/B
 };
 #endif

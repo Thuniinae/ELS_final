@@ -68,5 +68,6 @@ private:
 
   void feed_rgb();
 	void fetch_result();
+  void write(int i, int j);
 };
 #endif

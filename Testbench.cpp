@@ -127,10 +127,34 @@ int Testbench::write_bmp(string outfile_name) {
   return 0;
 }
 
+void Testbench::write(int i, int j) {
+  unsigned char R, G, B;      // color of R, G, B
+  if (i >= 0 && i < width && j >= 0 && j < height) {
+    R = *(source_bitmap +
+          bytes_per_pixel * (width * j + i) + 2);
+    G = *(source_bitmap +
+          bytes_per_pixel * (width * j + i) + 1);
+    B = *(source_bitmap +
+          bytes_per_pixel * (width * j + i) + 0);
+  } else {
+    R = 0;
+    G = 0;
+    B = 0;
+  }
+  sc_dt::sc_uint<24> rgb;
+  rgb.range(7, 0) = R;
+  rgb.range(15, 8) = G;
+  rgb.range(23, 16) = B;
+#ifndef NATIVE_SYSTEMC
+  o_rgb.put(rgb);
+#else
+  o_rgb.write(rgb);
+  wait(1); //emulate channel delay
+#endif
+}
+
 void Testbench::feed_rgb() {
   int x, y, i, v, u, j; // for loop counter
-  unsigned char R, G, B;      // color of R, G, B
-  int adjustX, adjustY, xBound, yBound;
 	n_txn = 0;
 	max_txn_time = SC_ZERO_TIME;
 	min_txn_time = SC_ZERO_TIME;
@@ -144,37 +168,52 @@ void Testbench::feed_rgb() {
 	o_rst.write(true);
 	wait(1);
 	total_start_time = sc_time_stamp();
+
+#ifndef NATIVE_SYSTEMC
+  o_rgb.put(height);
+#else
+  o_rgb.write(height);
+  wait(1); //emulate channel delay
+#endif
+#ifndef NATIVE_SYSTEMC
+  o_rgb.put(width);
+#else
+  o_rgb.write(width);
+  wait(1); //emulate channel delay
+#endif
   for (y = 0; y != height; ++y) {
     for (x = 0; x != width; ++x) {
-      adjustX = (MASK_X % 2) ? 1 : 0; // 1
-      adjustY = (MASK_Y % 2) ? 1 : 0; // 1
-      xBound = MASK_X / 2;            // 1
-      yBound = MASK_Y / 2;            // 1
-      for (v = y - 1; v <= y + 1; v++) {
-        for (u = x - 2; u <= x + 2; u++) {
-          for (j = v - 1; j <= v + 1; j++) {
-            if (u >= 0 && u < width && j >= 0 && j < height) {
-                R = *(source_bitmap +
-                      bytes_per_pixel * (width * j + u) + 2);
-                G = *(source_bitmap +
-                      bytes_per_pixel * (width * j + u) + 1);
-                B = *(source_bitmap +
-                      bytes_per_pixel * (width * j + u) + 0);
-              } else {
-                R = 0;
-                G = 0;
-                B = 0;
+      if (x == 0) {
+        for (u = x - 1; u <= x; u++) {
+          for (v = y - 1; v <= y + 1; v++) {
+            if (u == 0) {
+              for (i = u - 1; i <= u; i++) {
+                for (j = v - 1; j <= v + 1; j++) {
+                  write(i ,j);
+                }
               }
-              sc_dt::sc_uint<24> rgb;
-              rgb.range(7, 0) = R;
-              rgb.range(15, 8) = G;
-              rgb.range(23, 16) = B;
-#ifndef NATIVE_SYSTEMC
-              o_rgb.put(rgb);
-#else
-              o_rgb.write(rgb);
-              wait(1); //emulate channel delay
-#endif
+            }
+            for (i = u + 1; i <= u + 1; i++) {
+              for (j = v - 1; j <= v + 1; j++) {
+                write(i ,j);
+              }
+            }
+          }
+        }
+      }
+      for (u = x + 1; u <= x + 1; u++) {
+        for (v = y - 1; v <= y + 1; v++) {
+          if (u == 0) {
+            for (i = u - 1; i <= u; i++) {
+              for (j = v - 1; j <= v + 1; j++) {
+                write(i ,j);
+              }
+            }
+          }
+          for (i = u + 1; i <= u + 1; i++) {
+            for (j = v - 1; j <= v + 1; j++) {
+              write(i ,j);
+            }
           }
         }
       }
@@ -208,9 +247,9 @@ void Testbench::fetch_result() {
       *(target_bitmap + bytes_per_pixel * (width * y + x) + 2) = R;
       *(target_bitmap + bytes_per_pixel * (width * y + x) + 1) = G;
       *(target_bitmap + bytes_per_pixel * (width * y + x) + 0) = B;
-      if (cnt % 1000 == 0){
+      /*if (cnt % 1000 == 0){
         std::cout << "Now at " << sc_time_stamp() << std::endl; //print current sc_time
-      }
+      }*/
       cnt++;
     }
   }

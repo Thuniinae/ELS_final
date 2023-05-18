@@ -27,8 +27,9 @@ public:
 	~SobelFilter();
 private:
 	void do_filter();
-	unsigned char mdWin[3][MASK_X * MASK_Y];  // median filter window of size MASK_X x MASK_Y
 	int mean[3];  // mean filter result of R/G/B
-	unsigned char buffer[3][BUF_X][BUF_Y];  //buffer of R/G/B
+	unsigned char md_win[3][3 * 3]; // 3x3 pixels
+	unsigned char mn_win[3][3 * 3]; // 3x3 pixels
+	void do_median(int u, int v);
 };
 #endif

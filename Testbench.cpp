@@ -225,7 +225,6 @@ void Testbench::fetch_result() {
   unsigned int x, y; // for loop counter
   int total;
   unsigned char R, G, B;      // color of R, G, B
-  int cnt = 0;
 #ifndef NATIVE_SYSTEMC
 	i_result.reset();
 #endif
@@ -247,15 +246,8 @@ void Testbench::fetch_result() {
       *(target_bitmap + bytes_per_pixel * (width * y + x) + 2) = R;
       *(target_bitmap + bytes_per_pixel * (width * y + x) + 1) = G;
       *(target_bitmap + bytes_per_pixel * (width * y + x) + 0) = B;
-      /*if (cnt % 1000 == 0){
-        std::cout << "Now at " << sc_time_stamp() << std::endl; //print current sc_time
-      }*/
-      cnt++;
     }
   }
-  cout << "R: " << (int)R << endl;
-  cout << "G: " << (int)G << endl;
-  cout << "B: " << (int)B << endl;
 	total_run_time = sc_time_stamp() - total_start_time;
   sc_stop();
 }

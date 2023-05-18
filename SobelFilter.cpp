@@ -53,7 +53,15 @@ void SobelFilter::do_median(int u, int v){
 	if (u == 0) {
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j <3; j++) {
+				#ifndef NATIVE_SYSTEMC
+				{
+					HLS_DEFINE_PROTOCOL("input");
+					rgb = i_rgb.get();
+					wait();
+				}
+				#else
 				rgb = i_rgb.read();
+				#endif
 				md_win[0][j * 3 + i] = rgb.range(7, 0); 
 				md_win[1][j * 3 + i] = rgb.range(15, 8); 
 				md_win[2][j * 3 + i] = rgb.range(23, 16); 
@@ -63,7 +71,15 @@ void SobelFilter::do_median(int u, int v){
 	// fill new column
 	for (int i = 2; i < 3; i++) {
 		for (int j = 0; j <3; j++) {
+			#ifndef NATIVE_SYSTEMC
+			{
+				HLS_DEFINE_PROTOCOL("input");
+				rgb = i_rgb.get();
+				wait();
+			}
+			#else
 			rgb = i_rgb.read();
+			#endif
 			md_win[0][j * 3 + i] = rgb.range(7, 0); 
 			md_win[1][j * 3 + i] = rgb.range(15, 8); 
 			md_win[2][j * 3 + i] = rgb.range(23, 16); 
@@ -86,9 +102,7 @@ void SobelFilter::do_median(int u, int v){
 SobelFilter::SobelFilter( sc_module_name n ): sc_module( n )
 {
 #ifndef NATIVE_SYSTEMC
-	HLS_FLATTEN_ARRAY(mdWin);
 	HLS_FLATTEN_ARRAY(mean);
-	HLS_FLATTEN_ARRAY(buffer);
 #endif
 	SC_THREAD( do_filter );
 	sensitive << i_clk.pos();
@@ -114,8 +128,17 @@ void SobelFilter::do_filter() {
 		wait();
 	}
 	int width, height;
+	#ifndef NATIVE_SYSTEMC
+	{
+		HLS_DEFINE_PROTOCOL("input");
+		width = i_rgb.get();
+		height = i_rgb.get();
+		wait();
+	}
+	#else
 	width = i_rgb.read();
 	height = i_rgb.read();
+	#endif
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
 			if (x == 0) {
@@ -136,7 +159,15 @@ void SobelFilter::do_filter() {
 			rgb.range(7, 0) = Mean(mn_win[0]);
 			rgb.range(15, 8) = Mean(mn_win[1]);
 			rgb.range(23, 16) = Mean(mn_win[2]);
+			#ifndef NATIVE_SYSTEMC
+			{
+				HLS_DEFINE_PROTOCOL("output");
+				o_result.put(rgb);
+				wait();
+			}
+			#else
 			o_result.write(rgb);
+			#endif
 			// shift window
 			for (int u = 0; u < 2; u++) {
 				for (int v = 0; v < 3; v++) {

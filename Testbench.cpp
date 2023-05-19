@@ -4,6 +4,7 @@ using namespace std;
 
 #include "Testbench.h"
 
+
 unsigned char header[54] = {
     0x42,          // identity : B
     0x4d,          // identity : M
@@ -183,6 +184,7 @@ void Testbench::feed_rgb() {
 #endif
   for (y = 0; y != height; ++y) {
     for (x = 0; x != width; ++x) {
+      time_queue.push( sc_time_stamp());
       if (x == 0) {
         for (u = x - 1; u <= x; u++) {
           for (v = y - 1; v <= y + 1; v++) {
@@ -230,7 +232,7 @@ void Testbench::fetch_result() {
 #endif
 	wait(5);
 	wait(1);
-
+  unsigned long total_latency = 0;
   for (y = 0; y != height; ++y) {
     for (x = 0; x != width; ++x) {
       sc_dt::sc_uint<24> rgb;
@@ -240,6 +242,10 @@ void Testbench::fetch_result() {
 #else
       rgb = i_result.read();
 #endif
+      sc_time sent_time( time_queue.front() );                            // calculate latency
+      time_queue.pop();                                                   //
+      unsigned long latency = clock_cycle( sc_time_stamp() - sent_time ); //
+      total_latency += latency;                                           //
       R = rgb.range(7, 0);
       G = rgb.range(15, 8);
       B = rgb.range(23, 16);
@@ -248,6 +254,20 @@ void Testbench::fetch_result() {
       *(target_bitmap + bytes_per_pixel * (width * y + x) + 0) = B;
     }
   }
+  unsigned long average_latency = (total_latency / height / width);
+  std::cout << "average latency:" << average_latency << std::endl;
 	total_run_time = sc_time_stamp() - total_start_time;
+
   sc_stop();
+}
+
+////
+// Convert a time in simulation time units to clock cycles
+////
+int Testbench::clock_cycle( sc_time time )
+{
+    sc_clock * clk_p = dynamic_cast < sc_clock * >( i_clk.get_interface() );
+    sc_time clock_period = clk_p->period(); // get period from the sc_clock object.
+    return ( int )( time / clock_period );
+
 }

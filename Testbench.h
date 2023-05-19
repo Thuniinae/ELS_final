@@ -17,6 +17,11 @@ using namespace sc_core;
 #define BLACK 0
 #define THRESHOLD 90
 
+// use a queue to hold the time that each sample was sent
+// for latency calculations
+#include <queue>
+static std::queue<sc_time> time_queue;
+
 class Testbench : public sc_module {
 public:
 	sc_in_clk i_clk;
@@ -69,5 +74,6 @@ private:
   void feed_rgb();
 	void fetch_result();
   void write(int i, int j);
+  int clock_cycle( sc_time time );
 };
 #endif

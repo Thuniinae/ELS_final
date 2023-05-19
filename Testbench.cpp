@@ -188,15 +188,15 @@ void Testbench::feed_rgb() {
       if (x == 0) {
         for (u = x - 1; u <= x; u++) {
           for (v = y - 1; v <= y + 1; v++) {
-            if (u == 0) {
-              for (i = u - 1; i <= u; i++) {
-                for (j = v - 1; j <= v + 1; j++) {
+            if (v == y-1) {
+              for (j = v - 1; j <= v; j++) {
+                for (i = u - 1; i <= u + 1; i++) {
                   write(i ,j);
                 }
               }
             }
-            for (i = u + 1; i <= u + 1; i++) {
-              for (j = v - 1; j <= v + 1; j++) {
+            for (j = v + 1; j <= v + 1; j++) {
+              for (i = u - 1; i <= u + 1; i++) {
                 write(i ,j);
               }
             }
@@ -205,15 +205,15 @@ void Testbench::feed_rgb() {
       }
       for (u = x + 1; u <= x + 1; u++) {
         for (v = y - 1; v <= y + 1; v++) {
-          if (u == 0) {
-            for (i = u - 1; i <= u; i++) {
-              for (j = v - 1; j <= v + 1; j++) {
+          if (v == y-1) {
+            for (j = v - 1; j <= v; j++) {
+              for (i = u - 1; i <= u + 1; i++) {
                 write(i ,j);
               }
             }
           }
-          for (i = u + 1; i <= u + 1; i++) {
-            for (j = v - 1; j <= v + 1; j++) {
+          for (j = v + 1; j <= v + 1; j++) {
+            for (i = u - 1; i <= u + 1; i++) {
               write(i ,j);
             }
           }

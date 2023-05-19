@@ -50,9 +50,9 @@ unsigned char Mean(unsigned char *A){
 void SobelFilter::do_median(int u, int v){
 	sc_dt::sc_uint<24> rgb;
 	// fill buffer
-	if (u == 0) {
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j <3; j++) {
+	if (v == 0) {
+		for (int j = 0; j < 2; j++) {
+			for (int i = 0; i < 3; i++) {
 				#ifndef NATIVE_SYSTEMC
 				{
 					HLS_DEFINE_PROTOCOL("input");
@@ -68,9 +68,9 @@ void SobelFilter::do_median(int u, int v){
 			}
 		}
 	}
-	// fill new column
-	for (int i = 2; i < 3; i++) {
-		for (int j = 0; j <3; j++) {
+	// fill new row
+	for (int j = 2; j < 3; j++) {
+			for (int i = 0; i < 3; i++) {
 			#ifndef NATIVE_SYSTEMC
 			{
 				HLS_DEFINE_PROTOCOL("input");
@@ -90,11 +90,11 @@ void SobelFilter::do_median(int u, int v){
 	mn_win[1][v * 3 + u] = Median(md_win[1], 9);
 	mn_win[2][v * 3 + u] = Median(md_win[2], 9);
 	// shift buffer
-	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j <3; j++) {
-			md_win[0][j * 3 + i] = md_win[0][j * 3 + i + 1]; 
-			md_win[1][j * 3 + i] = md_win[1][j * 3 + i + 1]; 
-			md_win[2][j * 3 + i] = md_win[2][j * 3 + i + 1]; 
+	for (int j = 0; j < 2; j++) {
+			for (int i = 0; i < 3; i++) {
+			md_win[0][j * 3 + i] = md_win[0][(j+1) * 3 + i]; 
+			md_win[1][j * 3 + i] = md_win[1][(j+1) * 3 + i]; 
+			md_win[2][j * 3 + i] = md_win[2][(j+1) * 3 + i]; 
 		}
 	}
 }

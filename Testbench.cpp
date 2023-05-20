@@ -233,6 +233,7 @@ void Testbench::fetch_result() {
 	wait(5);
 	wait(1);
   unsigned long total_latency = 0;
+  sc_time previous_sent_time = sc_time(0, SC_NS);
   for (y = 0; y != height; ++y) {
     for (x = 0; x != width; ++x) {
       sc_dt::sc_uint<24> rgb;
@@ -246,6 +247,9 @@ void Testbench::fetch_result() {
       time_queue.pop();                                                   //
       unsigned long latency = clock_cycle( sc_time_stamp() - sent_time ); //
       total_latency += latency;                                           //
+      std::cout << "latency:" << latency << std::endl;
+      std::cout << "throughput:" << clock_cycle(sent_time - previous_sent_time) << std::endl;
+      previous_sent_time = sent_time;
       R = rgb.range(7, 0);
       G = rgb.range(15, 8);
       B = rgb.range(23, 16);

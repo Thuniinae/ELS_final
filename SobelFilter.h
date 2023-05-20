@@ -2,6 +2,7 @@
 #define SOBEL_FILTER_H_
 #include <systemc>
 using namespace sc_core;
+using namespace sc_dt;
 
 #ifndef NATIVE_SYSTEMC
 #include <cynw_p2p.h>
@@ -30,6 +31,6 @@ private:
 	int mean[3];  // mean filter result of R/G/B
 	unsigned char md_win[3][3 * 3]; // 3x3 pixels
 	unsigned char mn_win[3][3 * 3]; // 3x3 pixels
-	void do_median(int u, int v);
+	void do_median(sc_uint<2> u, sc_uint<2> v);
 };
 #endif

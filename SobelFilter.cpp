@@ -5,11 +5,11 @@
 
 #include "SobelFilter.h"
 
-unsigned char Median(unsigned char *A, unsigned int n){
+unsigned char Median(unsigned char *A){
 
-    for (unsigned int i = 0; i <= n / 2; i++){
+    for (sc_uint<3> i = 0; i != 4; i++){
 		unsigned char temp;
-    	unsigned int index;
+    	sc_uint<4> index;
 		{
 #ifndef NATIVE_SYSTEMC
 			HLS_CONSTRAIN_LATENCY(0, 2, "latM0");
@@ -17,7 +17,7 @@ unsigned char Median(unsigned char *A, unsigned int n){
         temp = A[i];
         index = i;
 		}
-        for (unsigned int j = i + 1; j < n; j++){
+        for (sc_uint<4> j = i + 1; j != 9; j++){
 #ifndef NATIVE_SYSTEMC
 			HLS_CONSTRAIN_LATENCY(0, 3, "latM1");
 #endif
@@ -34,25 +34,25 @@ unsigned char Median(unsigned char *A, unsigned int n){
         A[i] = temp;
 		}
     }
-    return A[n / 2];
+    return A[4];
 }
 
 unsigned char Mean(unsigned char *A){
-	int result;
+	sc_uint<12> result;
 	result = 0;
-	for (int i = 0; i < 9; i++) { // weighted mean
-		if (i == 4) result += A[i] * 2;	
+	for (sc_uint<4> i = 0; i != 9; i++) { // weighted mean
+		if (i == 4) result += A[i] << 1;	
 		else result += A[i];
 	}
 	return result / 10;
 }
 
-void SobelFilter::do_median(int u, int v){
+void SobelFilter::do_median(sc_uint<2> u, sc_uint<2> v){
 	sc_dt::sc_uint<24> rgb;
 	// fill buffer
 	if (v == 0) {
-		for (int j = 0; j < 2; j++) {
-			for (int i = 0; i < 3; i++) {
+		for (sc_uint<2> j = 0; j != 2; j++) {
+			for (sc_uint<3> i = 0; i != 3; i++) {
 				#ifndef NATIVE_SYSTEMC
 				{
 					HLS_DEFINE_PROTOCOL("input");
@@ -69,29 +69,27 @@ void SobelFilter::do_median(int u, int v){
 		}
 	}
 	// fill new row
-	for (int j = 2; j < 3; j++) {
-			for (int i = 0; i < 3; i++) {
-			#ifndef NATIVE_SYSTEMC
-			{
-				HLS_DEFINE_PROTOCOL("input");
-				rgb = i_rgb.get();
-				wait();
-			}
-			#else
-			rgb = i_rgb.read();
-			#endif
-			md_win[0][j * 3 + i] = rgb.range(7, 0); 
-			md_win[1][j * 3 + i] = rgb.range(15, 8); 
-			md_win[2][j * 3 + i] = rgb.range(23, 16); 
+	for (sc_uint<2> i = 0; i != 3; i++) {
+		#ifndef NATIVE_SYSTEMC
+		{
+			HLS_DEFINE_PROTOCOL("input");
+			rgb = i_rgb.get();
+			wait();
 		}
+		#else
+		rgb = i_rgb.read();
+		#endif
+		md_win[0][6 + i] = rgb.range(7, 0); 
+		md_win[1][6 + i] = rgb.range(15, 8); 
+		md_win[2][6 + i] = rgb.range(23, 16); 
 	}
 	// process
-	mn_win[0][v * 3 + u] = Median(md_win[0], 9);
-	mn_win[1][v * 3 + u] = Median(md_win[1], 9);
-	mn_win[2][v * 3 + u] = Median(md_win[2], 9);
+	mn_win[0][v * 3 + u] = Median(md_win[0]);
+	mn_win[1][v * 3 + u] = Median(md_win[1]);
+	mn_win[2][v * 3 + u] = Median(md_win[2]);
 	// shift buffer
-	for (int j = 0; j < 2; j++) {
-			for (int i = 0; i < 3; i++) {
+	for (sc_uint<2> j = 0; j != 2; j++) {
+		for (sc_uint<2> i = 0; i != 3; i++) {
 			md_win[0][j * 3 + i] = md_win[0][(j+1) * 3 + i]; 
 			md_win[1][j * 3 + i] = md_win[1][(j+1) * 3 + i]; 
 			md_win[2][j * 3 + i] = md_win[2][(j+1) * 3 + i]; 
@@ -118,7 +116,6 @@ SobelFilter::SobelFilter( sc_module_name n ): sc_module( n )
 SobelFilter::~SobelFilter() {}
 
 void SobelFilter::do_filter() {
-	sc_dt::sc_uint<24> rgb; // store input from FIFO
 	{
 #ifndef NATIVE_SYSTEMC
 		HLS_DEFINE_PROTOCOL("main_reset");
@@ -127,7 +124,7 @@ void SobelFilter::do_filter() {
 #endif
 		wait();
 	}
-	int width, height;
+	unsigned int width, height;
 	#ifndef NATIVE_SYSTEMC
 	{
 		HLS_DEFINE_PROTOCOL("input");
@@ -139,23 +136,24 @@ void SobelFilter::do_filter() {
 	width = i_rgb.read();
 	height = i_rgb.read();
 	#endif
-	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < width; x++) {
+	for (unsigned int y = 0; y != height; y++) {
+		for (unsigned int x = 0; x != width; x++) {
 			if (x == 0) {
 				// fill buffer
-				for (int u = 0; u < 2; u++) {
-					for (int v = 0; v < 3; v++) {
+				for (sc_uint<2> u = 0; u != 2; u++) {
+					for (sc_uint<2> v = 0; v != 3; v++) {
 						do_median(u, v);
 					}
 				}
 			}
 			// fill new column
-			for (int u = 2; u < 3; u++) {
-				for (int v = 0; v < 3; v++) {
+			for (sc_uint<2> u = 2; u != 3; u++) {
+				for (sc_uint<2> v = 0; v != 3; v++) {
 					do_median(u, v);
 				}
 			}
 			// process
+			sc_dt::sc_uint<24> rgb; // store input from FIFO
 			rgb.range(7, 0) = Mean(mn_win[0]);
 			rgb.range(15, 8) = Mean(mn_win[1]);
 			rgb.range(23, 16) = Mean(mn_win[2]);
@@ -169,8 +167,8 @@ void SobelFilter::do_filter() {
 			o_result.write(rgb);
 			#endif
 			// shift window
-			for (int u = 0; u < 2; u++) {
-				for (int v = 0; v < 3; v++) {
+			for (sc_uint<2> u = 0; u != 2; u++) {
+				for (sc_uint<2> v = 0; v != 3; v++) {
 					mn_win[0][v * 3 + u] = mn_win[0][v * 3 + u + 1];
 					mn_win[1][v * 3 + u] = mn_win[1][v * 3 + u + 1];
 					mn_win[2][v * 3 + u] = mn_win[2][v * 3 + u + 1];

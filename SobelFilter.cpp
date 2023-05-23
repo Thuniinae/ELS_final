@@ -33,14 +33,22 @@ void SobelFilter::do_filter() {
 #endif
 		wait();
 	}
+
+	int height, width;
+
+	width = read();
+	height = read();
+	printf("get image size: %d, %d\n", width, height);
 	
+
 	// read initial k-means
 	for (int i = 0; i < K; i++){
 		mean[i] = read();
 	}
+
 	for (int j = 0; j < 30; j++) { // iterate for new means 30 times
 		for (int i = 0; i < K; i++){ 
-			mean_new[i] = 0; // initialize
+			mean_total[i] = 0; // initialize
 		}
 		for (int x = 0; x < width; x = x + 16) {		// for all 16x16 sampled pixels
       		for (int y = 0; y < height; y = y + 16) {	//
@@ -49,21 +57,29 @@ void SobelFilter::do_filter() {
 				int min_index;
 				rgb = read();
 				
-				for (int i = 0; i < K; i++){ // calculate distance to K-means
-					distance[i] = distance(rgb, mean[i]);
+				for (int i = 0; i < K; i++) // calculate distance to K-means
+					distance[i] = cal_distance(rgb, mean[i]);
 
-				// cluster the sample pixel, increment average of new mean ot belongs to
+				// cluster the sample pixel, increment average of new mean it belongs to
 				min_index = arg_min(distance, K);
 				for (int i = 0; i < 3; i++) { // for R, G, B
-					mean_new[min_index].range((i<<3 + 7), i << 3) += 
-						rgb.range((i<<3 + 7), i << 3) >> 8 ; // divide by 256
+					mean_total[min_index].range((i<<4) + 15, i<<4) = 
+						mean_total[min_index].range((i<<4) + 15, i<<4)
+						 + (rgb.range((i<<3) + 7, i<<3));
 				}
 			}
 		}
-
 		// calculate replace original mean with the new one
-		for (int i = 0; i < K; i++){ // calculate distance to K-means
-			mean[i] = mean_new[i];
+		for (int i = 0; i < K; i++)
+			for (int k = 0; k < 3; k++) 
+				mean[k].range((k<<3) + 7, k<<3) 
+				= mean_total[k].range((k<<4) + 15, (k<<4)) >> 8; //divide by 256
+	}
+	cout << "colors:"<<endl;
+	for (int x = 0; x < K; x++){
+		cout << (int) mean[x].range(7,0) << ", ";
+		cout << (int) mean[x].range(15,8) << ", ";
+		cout << (int) mean[x].range(23,16) << endl;
 	}
 
 	// assume K-means has converge
@@ -74,15 +90,14 @@ void SobelFilter::do_filter() {
 			int min_index;
 			rgb = read();
 			
-			for (int i = 0; i < K; i++){ // calculate distance to K-means
-				distance[i] = distance(rgb, mean[i]);
+			for (int i = 0; i < K; i++) // calculate distance to K-means
+				distance[i] = cal_distance(rgb, mean[i]);
 
 			// cluster the pixel, output the color of the closest mean
 			min_index = arg_min(distance, K);
-			write(mean[mind_index]);
+			write(mean[min_index]);
 		}
 	}
-
 }
 
 sc_uint<24> SobelFilter::read() {
@@ -96,26 +111,28 @@ sc_uint<24> SobelFilter::read() {
 	#else
 	rgb = i_rgb.read();
 	#endif
+	//std::cout <<"read:" <<(int) rgb.range(7, 0) << std::endl;
 	return rgb;
 }
 
 // calculate distance to mean
-int SobelFilter::distance(sc_uint<24> from_rgb, sc_uint<24> to_rgb) {
+int SobelFilter::cal_distance(sc_uint<24> from_rgb, sc_uint<24> to_rgb) {
 	// distance of root mean suqre
-	unsigned char result;
+	int result;
 
 	result = 0;
-	// sum the difference
+	// sum the difference square
 	for (int i = 0; i < 3; i++) {
-		result + = (from_rgb.range((i << 3) + 7, i << 3) - from_rgb.range((i << 3) + 7, i << 3))^2
+		result = result +  (from_rgb.range((i << 3) + 7, i << 3) 
+			- to_rgb.range((i << 3) + 7, i << 3))*(from_rgb.range((i << 3) + 7, i << 3) 
+			- to_rgb.range((i << 3) + 7, i << 3));
 	}
-	// square the result
-	return result^0.5
+	return result;
 }
 
-unsigned char SobelFilter::arg_min(int distance[], int n){
+sc_uint<8> SobelFilter::arg_min(int distance[], int n){
 	int min;
-	unsigned char index;
+	sc_uint<8> index;
 
 	min = distance[0];
 	index = 0;
@@ -125,7 +142,6 @@ unsigned char SobelFilter::arg_min(int distance[], int n){
 			index = i;
 		}
 	}
-
 	return index;
 }
 

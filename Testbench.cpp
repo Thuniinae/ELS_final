@@ -128,7 +128,17 @@ int Testbench::write_bmp(string outfile_name) {
   return 0;
 }
 
-void Testbench::write(int i, int j) {
+void Testbench::write(sc_uint<24> rgb) {
+#ifndef NATIVE_SYSTEMC
+  o_rgb.put(rgb);
+#else
+  o_rgb.write(rgb);
+  wait(1); //emulate channel delay
+#endif
+//std::cout <<"write:" <<(int) rgb.range(7,0) << std::endl;
+}
+
+void Testbench::write_pixel(int i, int j) {
   unsigned char R, G, B;      // color of R, G, B
   if (i >= 0 && i < width && j >= 0 && j < height) {
     R = *(source_bitmap +
@@ -147,12 +157,7 @@ void Testbench::write(int i, int j) {
   rgb.range(7, 0) = R;
   rgb.range(15, 8) = G;
   rgb.range(23, 16) = B;
-#ifndef NATIVE_SYSTEMC
-  o_rgb.put(rgb);
-#else
-  o_rgb.write(rgb);
-  wait(1); //emulate channel delay
-#endif
+  write(rgb);
 }
 
 void Testbench::feed_rgb() {
@@ -171,28 +176,31 @@ void Testbench::feed_rgb() {
 	wait(1);
 	total_start_time = sc_time_stamp();
 
+  write(width);
+  write(height);
+
   // send initial K-means, K = 8
-  write(width>1, height>1);
-  write(width>2, height>1);
-  write(width>1, height>2);
-  write(width>2, height>2);
-  write(width>1 + width > 2, height>1 + height > 2);
-  write(width>1 + width > 2, height>1);
-  write(width>1, height>1 + height>2);
-  write(width>1 + width > 2, height>1 - height>2);
+  write_pixel(width>>1, height>>1);
+  write_pixel(width>>2, height>>1);
+  write_pixel(width>>1, height>>2);
+  write_pixel(width>>2, height>>2);
+  write_pixel((width>>1) + (width>>2), (height>>1) + (height>>2));
+  write_pixel((width>>1) + (width>>2), height>>1);
+  write_pixel(width>>1, (height>>1) + (height>>2));
+  write_pixel((width>>1) + (width>>2), (height>>1) - (height>>2));
 
   // send sampled pixels 30 times
   for (int i = 0; i < 30; i++) {
     for (int x = 0; x < width; x = x + 16) {
       for (int y = 0; y < height; y = y + 16) {
-        write(x , y);
+        write_pixel(x , y);
       }
     }
   }
   // send all the pixels for coloring
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
-      write(x , y);
+      write_pixel(x , y);
     }
   }
 }
@@ -212,6 +220,7 @@ void Testbench::fetch_result() {
   // read the processed image
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
+      sc_uint<24> rgb;
 #ifndef NATIVE_SYSTEMC
       rgb = i_result.get();
 #else

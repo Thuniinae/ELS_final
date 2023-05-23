@@ -6,6 +6,7 @@ using namespace std;
 
 #include <systemc>
 using namespace sc_core;
+using namespace sc_dt;
 
 #ifndef NATIVE_SYSTEMC
 #include <cynw_p2p.h>
@@ -73,7 +74,8 @@ private:
 
   void feed_rgb();
 	void fetch_result();
-  void write(int i, int j);
+  void write_pixel(int i, int j);
+  void write(sc_uint<24> rgb);
   int clock_cycle( sc_time time );
 };
 #endif

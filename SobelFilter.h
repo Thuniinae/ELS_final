@@ -1,8 +1,10 @@
 #ifndef SOBEL_FILTER_H_
 #define SOBEL_FILTER_H_
 #include <systemc>
+#include <cmath>
 using namespace sc_core;
 using namespace sc_dt;
+using namespace std;
 
 #define K 8
 
@@ -30,11 +32,11 @@ public:
 	~SobelFilter();
 private:
 	sc_uint<24> mean[K];
-	sc_uint<24> mean_new[K];
+	sc_uint<48> mean_total[K];
 	void do_filter();
 	sc_uint<24> read();
 	void write(sc_uint<24> rgb);
-	int distance(sc_uint<24> from_rgb, sc_uint<24> to_rgb);
-	unsigned char arg_min(int distance[], int n);
+	int cal_distance(sc_uint<24> from_rgb, sc_uint<24> to_rgb);
+	sc_uint<8> arg_min(int distance[], int n);
 };
 #endif

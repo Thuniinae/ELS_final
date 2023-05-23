@@ -4,6 +4,8 @@
 using namespace sc_core;
 using namespace sc_dt;
 
+#define K 8
+
 #ifndef NATIVE_SYSTEMC
 #include <cynw_p2p.h>
 #endif
@@ -27,10 +29,12 @@ public:
 	SobelFilter( sc_module_name n );
 	~SobelFilter();
 private:
+	sc_uint<24> mean[K];
+	sc_uint<24> mean_new[K];
 	void do_filter();
-	int mean[3];  // mean filter result of R/G/B
-	unsigned char md_win[3][3 * 3]; // 3x3 pixels
-	unsigned char mn_win[3][3 * 3]; // 3x3 pixels
-	void do_median(sc_uint<2> u, sc_uint<2> v);
+	sc_uint<24> read();
+	void write(sc_uint<24> rgb);
+	int distance(sc_uint<24> from_rgb, sc_uint<24> to_rgb);
+	unsigned char arg_min(int distance[], int n);
 };
 #endif

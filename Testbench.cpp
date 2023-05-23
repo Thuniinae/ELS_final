@@ -138,6 +138,7 @@ void Testbench::write(int i, int j) {
     B = *(source_bitmap +
           bytes_per_pixel * (width * j + i) + 0);
   } else {
+    std::cout << "caution, pixel out of range" << std::endl;
     R = 0;
     G = 0;
     B = 0;
@@ -170,55 +171,28 @@ void Testbench::feed_rgb() {
 	wait(1);
 	total_start_time = sc_time_stamp();
 
-#ifndef NATIVE_SYSTEMC
-  o_rgb.put(height);
-#else
-  o_rgb.write(height);
-  wait(1); //emulate channel delay
-#endif
-#ifndef NATIVE_SYSTEMC
-  o_rgb.put(width);
-#else
-  o_rgb.write(width);
-  wait(1); //emulate channel delay
-#endif
-  for (y = 0; y != height; ++y) {
-    for (x = 0; x != width; ++x) {
-      time_queue.push( sc_time_stamp());
-      if (x == 0) {
-        for (u = x - 1; u <= x; u++) {
-          for (v = y - 1; v <= y + 1; v++) {
-            if (v == y-1) {
-              for (j = v - 1; j <= v; j++) {
-                for (i = u - 1; i <= u + 1; i++) {
-                  write(i ,j);
-                }
-              }
-            }
-            for (j = v + 1; j <= v + 1; j++) {
-              for (i = u - 1; i <= u + 1; i++) {
-                write(i ,j);
-              }
-            }
-          }
-        }
+  // send initial K-means, K = 8
+  write(width>1, height>1);
+  write(width>2, height>1);
+  write(width>1, height>2);
+  write(width>2, height>2);
+  write(width>1 + width > 2, height>1 + height > 2);
+  write(width>1 + width > 2, height>1);
+  write(width>1, height>1 + height>2);
+  write(width>1 + width > 2, height>1 - height>2);
+
+  // send sampled pixels 30 times
+  for (int i = 0; i < 30; i++) {
+    for (int x = 0; x < width; x = x + 16) {
+      for (int y = 0; y < height; y = y + 16) {
+        write(x , y);
       }
-      for (u = x + 1; u <= x + 1; u++) {
-        for (v = y - 1; v <= y + 1; v++) {
-          if (v == y-1) {
-            for (j = v - 1; j <= v; j++) {
-              for (i = u - 1; i <= u + 1; i++) {
-                write(i ,j);
-              }
-            }
-          }
-          for (j = v + 1; j <= v + 1; j++) {
-            for (i = u - 1; i <= u + 1; i++) {
-              write(i ,j);
-            }
-          }
-        }
-      }
+    }
+  }
+  // send all the pixels for coloring
+  for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++) {
+      write(x , y);
     }
   }
 }
@@ -234,22 +208,15 @@ void Testbench::fetch_result() {
 	wait(1);
   unsigned long total_latency = 0;
   sc_time previous_sent_time = sc_time(0, SC_NS);
-  for (y = 0; y != height; ++y) {
-    for (x = 0; x != width; ++x) {
-      sc_dt::sc_uint<24> rgb;
+
+  // read the processed image
+  for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++) {
 #ifndef NATIVE_SYSTEMC
       rgb = i_result.get();
-      
 #else
       rgb = i_result.read();
 #endif
-      sc_time sent_time( time_queue.front() );                            // calculate latency
-      time_queue.pop();                                                   //
-      unsigned long latency = clock_cycle( sc_time_stamp() - sent_time ); //
-      total_latency += latency;                                           //
-      std::cout << "latency:" << latency << std::endl;
-      std::cout << "throughput:" << clock_cycle(sent_time - previous_sent_time) << std::endl;
-      previous_sent_time = sent_time;
       R = rgb.range(7, 0);
       G = rgb.range(15, 8);
       B = rgb.range(23, 16);
@@ -261,7 +228,6 @@ void Testbench::fetch_result() {
   unsigned long average_latency = (total_latency / height / width);
   std::cout << "average latency:" << average_latency << std::endl;
 	total_run_time = sc_time_stamp() - total_start_time;
-
   sc_stop();
 }
 

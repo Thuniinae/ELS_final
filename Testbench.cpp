@@ -234,8 +234,7 @@ void Testbench::fetch_result() {
       *(target_bitmap + bytes_per_pixel * (width * y + x) + 0) = B;
     }
   }
-  unsigned long average_latency = (total_latency / height / width);
-  std::cout << "average latency:" << average_latency << std::endl;
+  std::cout << "latency:" << clock_cycle(sc_time_stamp() - total_start_time) << std::endl;
 	total_run_time = sc_time_stamp() - total_start_time;
   sc_stop();
 }

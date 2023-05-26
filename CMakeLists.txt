@@ -34,11 +34,11 @@ add_executable(sobel ${SRC})
 target_link_libraries(sobel SystemC::systemc)
 
 # Add test sobel filter command
-set(OUT_FILE "lena_color_512_noise_free_buf.bmp")
-set(OUT_FILE2 "peppers_color_noise_free_buf.bmp")
+set(OUT_FILE "lena_color_512_seg.bmp")
+set(OUT_FILE2 "peppers_color_seg.bmp")
 add_custom_command(OUTPUT ${OUT_FILE}
-	COMMAND ./sobel ../lena_color_512_noise.bmp ./${OUT_FILE}
-	COMMAND ./sobel ../peppers_color_noise.bmp ./${OUT_FILE2}
+	COMMAND ./sobel ../lena_color_512.bmp ./${OUT_FILE}
+	COMMAND ./sobel ../peppers_color.bmp ./${OUT_FILE2}
 	DEPENDS sobel
 	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}	
 )

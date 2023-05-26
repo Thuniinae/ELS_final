@@ -2,17 +2,14 @@
 #define SOBEL_FILTER_H_
 #include <systemc>
 #include <cmath>
+#include "param.h"
 using namespace sc_core;
 using namespace sc_dt;
 using namespace std;
 
-#define K 8
-
 #ifndef NATIVE_SYSTEMC
 #include <cynw_p2p.h>
 #endif
-
-#include "filter_def.h"
 
 class SobelFilter: public sc_module
 {

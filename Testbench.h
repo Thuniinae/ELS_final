@@ -12,8 +12,6 @@ using namespace sc_dt;
 #include <cynw_p2p.h>
 #endif
 
-#include "filter_def.h"
-
 #define WHITE 255
 #define BLACK 0
 #define THRESHOLD 90

@@ -75,12 +75,6 @@ void SobelFilter::do_filter() {
 				mean[k].range((k<<3) + 7, k<<3) 
 				= mean_total[k].range((k<<4) + 15, (k<<4)) >> 8; //divide by 256
 	}
-	cout << "colors:"<<endl;
-	for (int x = 0; x < K; x++){
-		cout << (int) mean[x].range(7,0) << ", ";
-		cout << (int) mean[x].range(15,8) << ", ";
-		cout << (int) mean[x].range(23,16) << endl;
-	}
 
 	// assume K-means has converge
 	for (int x = 0; x < width; x++) {		// for all pixels in the image

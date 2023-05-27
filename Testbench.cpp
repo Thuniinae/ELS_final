@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cstdlib>
+#include <cmath>
 using namespace std;
 
 #include "Testbench.h"
@@ -35,9 +36,6 @@ Testbench::Testbench(sc_module_name n) : sc_module(n), output_rgb_raw_data_offse
 }
 
 Testbench::~Testbench() {
-	//cout<< "Max txn time = " << max_txn_time << endl;
-	//cout<< "Min txn time = " << min_txn_time << endl;
-	//cout<< "Avg txn time = " << total_txn_time/n_txn << endl;
 	cout << "Total run time = " << total_run_time << endl;
 }
 
@@ -128,17 +126,49 @@ int Testbench::write_bmp(string outfile_name) {
   return 0;
 }
 
-void Testbench::write(sc_uint<24> rgb) {
-#ifndef NATIVE_SYSTEMC
-  o_rgb.put(rgb);
-#else
-  o_rgb.write(rgb);
-  wait(1); //emulate channel delay
-#endif
-//std::cout <<"write:" <<(int) rgb.range(7,0) << std::endl;
+////
+// Convert a time in simulation time units to clock cycles
+////
+int Testbench::clock_cycle( sc_time time ) {
+    sc_clock * clk_p = dynamic_cast < sc_clock * >( i_clk.get_interface() );
+    sc_time clock_period = clk_p->period(); // get period from the sc_clock object.
+    return ( int )( time / clock_period );
+
 }
 
-void Testbench::write_pixel(int i, int j) {
+void Testbench::write(sc_uint<24> rgb, int channel) {
+  switch(channel){
+    case 1:
+      #ifndef NATIVE_SYSTEMC
+        o_rgb1.put(rgb);
+      #else
+        o_rgb1.write(rgb);
+        wait(1); //emulate channel delay
+      #endif
+      break;
+    case 2:
+      #ifndef NATIVE_SYSTEMC
+        o_rgb2.put(rgb);
+      #else
+        o_rgb2.write(rgb);
+        wait(1); //emulate channel delay
+      #endif
+      break;
+    case 3:
+      #ifndef NATIVE_SYSTEMC
+        o_rgb3.put(rgb);
+      #else
+        o_rgb3.write(rgb);
+        wait(1); //emulate channel delay
+      #endif
+      break;
+    default:
+      cout << "unknown rgb channel!" << endl;
+      break;
+  }
+}
+
+sc_uint<24> Testbench::pixel(unsigned int i, unsigned int j) {
   unsigned char R, G, B;      // color of R, G, B
   if (i >= 0 && i < width && j >= 0 && j < height) {
     R = *(source_bitmap +
@@ -157,65 +187,118 @@ void Testbench::write_pixel(int i, int j) {
   rgb.range(7, 0) = R;
   rgb.range(15, 8) = G;
   rgb.range(23, 16) = B;
-  write(rgb);
+  return rgb;
 }
 
-void Testbench::feed_rgb() {
-  int x, y, i, v, u, j; // for loop counter
-	n_txn = 0;
-	max_txn_time = SC_ZERO_TIME;
-	min_txn_time = SC_ZERO_TIME;
-	total_txn_time = SC_ZERO_TIME;
+void Testbench::write_mean(sc_biguint<192> mean, int channel){
+  switch(channel){
+    case 1:
+      #ifndef NATIVE_SYSTEMC
+        o_mean1.put(mean);
+      #else
+        o_mean1.write(mean);
+        wait(1); //emulate channel delay
+      #endif
+      break;
+    case 2:
+      #ifndef NATIVE_SYSTEMC
+        o_mean2.put(mean);
+      #else
+        o_mean2.write(mean);
+        wait(1); //emulate channel delay
+      #endif
+      break;
+    case 3:
+      #ifndef NATIVE_SYSTEMC
+        o_mean3.put(mean);
+      #else
+        o_mean3.write(mean);
+        wait(1); //emulate channel delay
+      #endif
+      break;
+    default:
+      cout << "unknown mean channel!" << endl;
+      break;
+  }
+}
 
-#ifndef NATIVE_SYSTEMC
-	o_rgb.reset();
-#endif
+sc_biguint<192> Testbench::read_mean1() {
+  sc_biguint<192> mean;
+  #ifndef NATIVE_SYSTEMC
+    mean = i_mean1.get();
+  #else
+    mean = i_mean1.read();
+  #endif
+  return mean;
+}
+
+
+void Testbench::feed_rgb() {
+  #ifndef NATIVE_SYSTEMC
+    o_rgb1.reset();
+    o_rgb2.reset();
+    o_rgb3.reset();
+	  o_mean1.reset();
+	  i_mean1.reset();
+	  o_mean2.reset();
+	  o_mean3.reset();
+  #endif
 	o_rst.write(false);
 	wait(5);
 	o_rst.write(true);
 	wait(1);
 	total_start_time = sc_time_stamp();
 
-  write(width);
-  write(height);
-
   // send initial K-means, K = 8
-  write_pixel(width>>1, height>>1);
-  write_pixel(width>>2, height>>1);
-  write_pixel(width>>1, height>>2);
-  write_pixel(width>>2, height>>2);
-  write_pixel((width>>1) + (width>>2), (height>>1) + (height>>2));
-  write_pixel((width>>1) + (width>>2), height>>1);
-  write_pixel(width>>1, (height>>1) + (height>>2));
-  write_pixel((width>>1) + (width>>2), (height>>1) - (height>>2));
+  sc_biguint<192> mean;
+  
 
-  // send sampled pixels 30 times
-  for (int i = 0; i < 30; i++) {
-    for (int x = 0; x < width; x = x + 16) {
-      for (int y = 0; y < height; y = y + 16) {
-        write_pixel(x , y);
+  // select initial mean
+  mean.range(23, 0) = pixel(width>>1, height>>1);
+  mean.range(47, 24) = pixel(width>>2, height>>1);
+  mean.range(71, 48) = pixel(width>>1, height>>2);
+  mean.range(95, 72) = pixel(width>>2, height>>2);
+  mean.range(119, 96) = pixel((width>>1) + (width>>2), (height>>1) + (height>>2));
+  mean.range(143, 120) = pixel((width>>1) + (width>>2), height>>1);
+  mean.range(167, 144) = pixel(width>>1, (height>>1) + (height>>2));
+  mean.range(191, 168) = pixel((width>>1) + (width>>2), (height>>1) - (height>>2));
+  
+
+  for(int i = 0; i < 30; i++) { // send sampled pixels until converge (maximum 30 times)
+    for (unsigned int x = 0; x < width; x = x + 16) {
+      for (unsigned int y = 0; y < height; y = y + 16) {
+        write_mean(mean, 1);
+        write(pixel(x , y), 1);
+        write(pixel(x , y), 2);
       }
+    }
+    sc_biguint<192> new_mean;
+    new_mean = read_mean1();
+    if (!converge(mean, new_mean, 10)) // if not converge
+      mean = new_mean;
+    else {
+      mean = new_mean;
+      break;
     }
   }
   // send all the pixels for coloring
-  for (int x = 0; x < width; x++) {
-    for (int y = 0; y < height; y++) {
-      write_pixel(x , y);
+  for (unsigned int x = 0; x < width; x++) {
+    for (unsigned int y = 0; y < height; y++) {
+      write_mean(mean, 2);
+      write_mean(mean, 3);
+      write(pixel(x , y), 3);
     }
   }
 }
 
+
 void Testbench::fetch_result() {
-  unsigned int x, y; // for loop counter
-  int total;
   unsigned char R, G, B;      // color of R, G, B
 #ifndef NATIVE_SYSTEMC
 	i_result.reset();
 #endif
 	wait(5);
 	wait(1);
-  unsigned long total_latency = 0;
-  sc_time previous_sent_time = sc_time(0, SC_NS);
 
   // read the processed image
   for (int x = 0; x < width; x++) {
@@ -239,13 +322,24 @@ void Testbench::fetch_result() {
   sc_stop();
 }
 
-////
-// Convert a time in simulation time units to clock cycles
-////
-int Testbench::clock_cycle( sc_time time )
-{
-    sc_clock * clk_p = dynamic_cast < sc_clock * >( i_clk.get_interface() );
-    sc_time clock_period = clk_p->period(); // get period from the sc_clock object.
-    return ( int )( time / clock_period );
-
+bool Testbench::converge (sc_biguint<192> mean1, sc_biguint<192> mean2, sc_uint<8> threshold) {
+  bool result;
+  sc_uint<16> error;
+  // mean square error for 8 means
+  result = true;
+  for (int i = 0; i < K; i++) { // for K-means
+    sc_uint<24> m1, m2;
+    m1 = mean1.range(i * 24 + 23, i * 24);
+    m2 = mean2.range(i * 24 + 23, i * 24);
+    error = 0; // initialize
+    for (int j = 0; j < 3; j++){ // for R, G, B
+      error += pow(m1.range((j<<3) + 7, j<<3) - m2.range((j<<3) + 7, j<<3), 2);
+    }
+    if (error > threshold * threshold) {
+      result = false;
+      break;
+    }
+  }
+  return result;
 }
+

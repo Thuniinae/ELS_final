@@ -12,6 +12,7 @@ using namespace sc_dt;
 #include <cynw_p2p.h>
 #endif
 
+#define K 8
 #define WHITE 255
 #define BLACK 0
 #define THRESHOLD 90
@@ -26,10 +27,22 @@ public:
 	sc_in_clk i_clk;
 	sc_out < bool >  o_rst;
 #ifndef NATIVE_SYSTEMC
-	cynw_p2p< sc_dt::sc_uint<24> >::base_out o_rgb;
+	cynw_p2p< sc_dt::sc_uint<24> >::base_out o_rgb1;
+	cynw_p2p< sc_dt::sc_uint<24> >::base_out o_rgb2;
+	cynw_p2p< sc_dt::sc_uint<24> >::base_out o_rgb3;
+	cynw_p2p< sc_dt::sc_biguint<192> >::base_out o_mean1;
+	cynw_p2p< sc_dt::sc_biguint<192> >::base_out o_mean2;
+	cynw_p2p< sc_dt::sc_biguint<192> >::base_out o_mean3;
+	cynw_p2p< sc_dt::sc_biguint<192> >::base_in i_mean1;
 	cynw_p2p< sc_dt::sc_uint<24> >::base_in i_result;
 #else
-	sc_fifo_out< sc_dt::sc_uint<24> > o_rgb;
+	sc_fifo_out< sc_dt::sc_uint<24> > o_rgb1;
+	sc_fifo_out< sc_dt::sc_uint<24> > o_rgb2;
+	sc_fifo_out< sc_dt::sc_uint<24> > o_rgb3;
+	sc_fifo_out< sc_dt::sc_biguint<192> > o_mean1;
+	sc_fifo_out< sc_dt::sc_biguint<192> > o_mean2;
+	sc_fifo_out< sc_dt::sc_biguint<192> > o_mean3;
+	sc_fifo_in< sc_dt::sc_biguint<192> > i_mean1;
 	sc_fifo_in< sc_dt::sc_uint<24> > i_result;
 #endif
 
@@ -70,10 +83,14 @@ private:
 	sc_time total_start_time;
 	sc_time total_run_time;
 
+
+  int clock_cycle( sc_time time );
+  sc_uint<24> pixel(unsigned int i, unsigned int j);
+  void write(sc_uint<24> rgb, int channel);
+  void write_mean(sc_biguint<192> mean, int channel);
+  sc_biguint<192> read_mean1();
   void feed_rgb();
 	void fetch_result();
-  void write_pixel(int i, int j);
-  void write(sc_uint<24> rgb);
-  int clock_cycle( sc_time time );
+  bool converge (sc_biguint<192> mean1, sc_biguint<192> mean2, sc_uint<8> threshold);
 };
 #endif

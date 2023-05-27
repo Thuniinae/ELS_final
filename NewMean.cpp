@@ -26,10 +26,23 @@ void NewMean::do_calculation(){
 		sc_biguint<192> new_means;
 		for (int i = 0; i < K; i++) // initialize
 			total_mean[i] = 0;
-		for (int i = 0; i < Sample(Height) * Sample(Width); i++) // for all sampled pixels
-			total_mean[read_index()] += read();
-		for (int i = 0; i < 8; i++)
-			new_means.range((i<<3) * 3 + 15, (i<<3) * 3) = Sample(Sample(total_mean[i])); // divide 256 to get average
+		for (int i = 0; i < Sample(Height) * Sample(Width); i++){ // for all sampled pixels
+			sc_uint<24> rgb;
+			sc_uint<3> index;
+			rgb = read();
+			index = read_index();
+			for (int j =0; j < 3; j++) { // for R, G, B
+				total_mean[index].range((j<<4) + 15, j<<3)
+					= total_mean[index].range((j<<4) + 15, j<<3) 
+					+ rgb.range((j<<3) + 7, j<<3) ;
+			}
+		}
+		for (int i = 0; i < 8; i++){
+			for (int j =0; j < 3; j++) { // for R, G, B
+				new_means.range((i * 24) + (j<<3) + 7, (i * 24) + (j<<3))
+				=  Sample(Sample(total_mean[i].range((j<<4) + 15, j<<3)));
+			}
+		}
 		write(new_means);
 	}
 }

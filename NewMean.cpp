@@ -35,11 +35,16 @@ void NewMean::do_calculation(){
 			sc_uint<3> index;
 			rgb = read();
 			index = read_index();
-			for (int j =0; j < 3; j++) { // for R, G, B
-				total_mean[index].range((j*18) + 17, j*18)
-					= total_mean[index].range((j*18) + 17, j*18)
-					+ rgb.range((j<<3) + 7, j<<3) ;
-			}
+			// add RGB to total_mean
+			total_mean[index].range(17, 0)
+				= total_mean[index].range(17, 0)
+				+ rgb.range(7, 0);
+			total_mean[index].range(35, 18)
+				= total_mean[index].range(35, 18)
+				+ rgb.range(15, 8);
+			total_mean[index].range(53, 36)
+				= total_mean[index].range(53, 36)
+				+ rgb.range(23, 16);
 			mean_num[index] += 1;
 		}
 		for (int i = 0; i < 8; i++){

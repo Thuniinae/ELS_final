@@ -304,17 +304,11 @@ void Testbench::feed_rgb() {
     for (unsigned int y = 0; y < height; y++) {
       write_mean(mean, 2);
       write_mean(mean, 3);
-      /*cout << "rgb:" << endl;
-      for (int j =0; j < 3; j++) { // for R, G, B
-				cout << pixel(x , y).range((j<<3) + 7, (j<<3)) << ", ";
-			}
-      cout << endl;*/
       write(pixel(x , y), 3);
 			
     }
   }
 }
-
 
 void Testbench::fetch_result() {
   unsigned char R, G, B;      // color of R, G, B

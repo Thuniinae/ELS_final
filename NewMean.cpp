@@ -33,10 +33,6 @@ void NewMean::do_calculation(){
 			sc_uint<3> index;
 			rgb = read();
 			index = read_index();
-			/*cout << "rgb: " << rgb.range(7,0) << " ";
-			cout << rgb.range(15,8) << " ";
-			cout << rgb.range(23,16) << " " << endl;
-			cout << "index: " << index << endl;*/
 			for (int j =0; j < 3; j++) { // for R, G, B
 				total_mean[index].range((j*18) + 17, j*18)
 					= total_mean[index].range((j*18) + 17, j*18)
@@ -44,11 +40,6 @@ void NewMean::do_calculation(){
 			}
 			mean_num[index] += 1;
 		}
-		/*cout << "mean_nums:" << endl;
-		for (int i = 0; i < 8; i++){
-			cout << mean_num[i] << ", ";
-		}
-		cout << endl;*/
 		for (int i = 0; i < 8; i++){
 			for (int j =0; j < 3; j++) { // for R, G, B
 				if (mean_num[i] != 0)
@@ -58,21 +49,6 @@ void NewMean::do_calculation(){
 					new_means.range((i * 24) + (j<<3) + 7, (i * 24) + (j<<3)) = 0;
 			}
 		}
-		/*cout << "total means:" << endl;
-		for (int i = 0; i < 8; i++){
-			for (int j =0; j < 3; j++) { // for R, G, B
-				cout << total_mean[i].range((j*18) + 17, j*18) << " ";
-			}
-			cout << endl;
-		}
-		cout << "new means:" << endl;
-		for (int i = 0; i < 8; i++){
-			for (int j =0; j < 3; j++) { // for R, G, B
-				cout << new_means.range((i * 24) + (j<<3) + 7, (i * 24) + (j<<3)) << ", ";
-			}
-			cout << endl;
-		}
-		sc_stop();*/
 		write(new_means);
 	}
 }
@@ -88,7 +64,6 @@ sc_uint<24> NewMean::read() {
 	#else
 	rgb = i_rgb.read();
 	#endif
-	//std::cout <<"read:" <<(int) rgb.range(7, 0) << std::endl;
 	return rgb;
 }
 

@@ -38,7 +38,7 @@ private:
 	sc_clock clk;
 	sc_signal<bool> rst;
 #ifndef NATIVE_SYSTEMC
-	cynw_p2p< sc_dt::sc_uint<24>  rgb1;
+	cynw_p2p< sc_dt::sc_uint<24> >rgb1;
 	cynw_p2p< sc_dt::sc_uint<24> >rgb2;
 	cynw_p2p< sc_dt::sc_uint<24> >rgb3;
 	cynw_p2p< sc_dt::sc_uint<24> >rgb4;
@@ -50,6 +50,7 @@ private:
 	cynw_p2p< sc_dt::sc_biguint<144> >distance2;
 	cynw_p2p< sc_dt::sc_uint<3> >index1;
 	cynw_p2p< sc_dt::sc_uint<3> >index2;
+	cynw_p2p< sc_dt::sc_biguint<192> >mean3;
 #else
 	sc_fifo< sc_dt::sc_uint<24> >rgb1;
 	sc_fifo< sc_dt::sc_uint<24> >rgb2;

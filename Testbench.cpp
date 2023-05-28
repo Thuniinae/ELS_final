@@ -284,17 +284,23 @@ void Testbench::feed_rgb() {
   mean.range(167, 144) = pixel(width>>1, (height>>1) + (height>>2));
   mean.range(191, 168) = pixel((width>>1) + (width>>2), (height>>1) - (height>>2));
   int cnt = 0;
+  sc_time t1;
   for(int k = 0; k < 30; k++) { // send sampled pixels until converge (maximum 30 times)
     for (unsigned int x = 0; x < width; x = x + 16) {
       for (unsigned int y = 0; y < height; y = y + 16) {
+        sc_time t0 = sc_time_stamp();
         write(pixel(x , y), 1);
         write_mean(mean, 1);
+        sc_uint<3> index = read_index();
+        t1 = sc_time_stamp();
+        cout << "GD_AM latency:" << clock_cycle(t1 - t0) << endl;
         write(pixel(x , y), 2);
-        write_index(read_index(), 1);
+        write_index(index, 1);
       }
     }
     sc_biguint<192> new_mean;
     new_mean = read_mean();
+    cout << "NM last rgb latency:" << clock_cycle(sc_time_stamp() - t1) << endl;
     /*cout << cnt << endl;
     cout << "means:" << endl;
 		for (int i = 0; i < 8; i++){
@@ -321,9 +327,13 @@ void Testbench::feed_rgb() {
   // send all the pixels for coloring
   for (unsigned int x = 0; x < width; x++) {
     for (unsigned int y = 0; y < height; y++) {
+      sc_time t0 = sc_time_stamp();
       write(pixel(x , y), 1);
       write_mean(mean, 1);
-      write_index(read_index(), 2);
+      sc_uint<3> index = read_index();
+      cout << "GD-AM-2 latency: " << clock_cycle(sc_time_stamp() - t0) << endl;
+      time_queue.push( sc_time_stamp() );
+      write_index(index, 2);
       write_mean(mean, 2);
     }
   }
@@ -346,6 +356,9 @@ void Testbench::fetch_result() {
 #else
       rgb = i_result.read();
 #endif
+      sc_time t0( time_queue.front() );
+      time_queue.pop();    
+      cout << "CP latency: " << clock_cycle(sc_time_stamp() - t0) << endl;
       R = rgb.range(7, 0);
       G = rgb.range(15, 8);
       B = rgb.range(23, 16);

@@ -48,20 +48,35 @@ define_system_module ../System.cpp
 # SC_MODULEs to be synthesized
 #
 ### 3. Add your design source files here (to be high-level synthesized).
-define_hls_module SobelFilter ../SobelFilter.cpp
+define_hls_module GetDistance ../GetDistance.cpp
+define_hls_module ArgMin ../ArgMin.cpp
+define_hls_module NewMean ../NewMean.cpp
+define_hls_module ColorPixel ../ColorPixel.cpp
 
 ### 4. Define your HLS configuration (arbitrary names, BASIC and DPA in this example). 
-define_hls_config SobelFilter BASIC
-define_hls_config SobelFilter DPA       --dpopt_auto=op,expr
+define_hls_config GetDistance BASIC
+define_hls_config ArgMin BASIC
+define_hls_config NewMean BASIC
+define_hls_config ColorPixel BASIC
+define_hls_config GetDistance DPA       --dpopt_auto=op,expr
+define_hls_config ArgMin DPA       --dpopt_auto=op,expr
+define_hls_config NewMean DPA       --dpopt_auto=op,expr
+define_hls_config ColorPixel DPA       --dpopt_auto=op,expr
 
 set IMAGE_DIR           ".."
-set IN_FILE_NAME        "${IMAGE_DIR}/lena_std_short.bmp"
-set OUT_FILE_NAME				"out.bmp"
+set IN_FILE_NAME        "${IMAGE_DIR}/lena_color_512.bmp"
+set OUT_FILE_NAME		"lena_color_512_seg.bmp"
 
 ### 5. Define simulation configuration for each HLS configuration
 ### 5.1 The behavioral simulation (C++ only).
 define_sim_config B -argv "$IN_FILE_NAME $OUT_FILE_NAME"
 ### 5.2 The Verilog simulation for HLS config "BASIC". 
-define_sim_config V_BASIC "SobelFilter RTL_V BASIC" -argv "$IN_FILE_NAME $OUT_FILE_NAME"
 ### 5.3 The Verilog simulation for HLS config "DPA". 
-define_sim_config V_DPA "SobelFilter RTL_V DPA" -argv "$IN_FILE_NAME $OUT_FILE_NAME"
+foreach cfg { BASIC DPA } {
+	define_sim_config V_${cfg} \
+	"GetDistance RTL_V ${cfg}" \
+	"ArgMin RTL_V ${cfg}" \
+	"NewMean RTL_V ${cfg}" \
+	"ColorPixel RTL_V ${cfg}" \
+	-argv "$IN_FILE_NAME $OUT_FILE_NAME"
+}

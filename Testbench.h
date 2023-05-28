@@ -34,7 +34,7 @@ public:
 	cynw_p2p< sc_dt::sc_uint<3> >::base_out o_indexTN;
 	cynw_p2p< sc_dt::sc_uint<3> >::base_out o_indexTC;
 	cynw_p2p< sc_dt::sc_uint<3> >::base_in i_indexAT;
-	cynw_p2p< sc_dt::sc_uint<192> >::base_in i_meanNT;
+	cynw_p2p< sc_dt::sc_biguint<192> >::base_in i_meanNT;
 	cynw_p2p< sc_dt::sc_uint<24> >::base_in i_result;
 #else
 	sc_fifo_out< sc_dt::sc_uint<24> > o_rgbTG;

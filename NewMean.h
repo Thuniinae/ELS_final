@@ -30,7 +30,8 @@ public:
 	NewMean( sc_module_name n );
 private:
 	void do_calculation();
-	sc_uint<48> total_mean[K];
+	sc_uint<10> mean_num[K];
+	sc_uint<54> total_mean[K];
 	sc_uint<3> read_index();
 	sc_uint<24> read();
 	void write(sc_biguint<192> mean);

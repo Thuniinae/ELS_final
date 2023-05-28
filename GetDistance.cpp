@@ -25,7 +25,7 @@ void GetDistance::do_calculation(){
 	while (true){
 		sc_uint<24> rgb;
 		sc_biguint<192> mean;
-		sc_biguint<128> result;
+		sc_biguint<144> result;
 
 		result = 0;
 		rgb = read();
@@ -34,8 +34,8 @@ void GetDistance::do_calculation(){
 		for (int j = 0; j < K; j++) {
 			// sum the difference square of RGB
 			for (int i = 0; i < 3; i++) {
-				result.range((j<<4) + 15, j<<4) = 
-					result.range((j<<4) + 15, j<<4)+ 
+				result.range((j * 18) + 17, j * 18) = 
+					result.range((j * 18) + 17, j * 18)+ 
 					(rgb.range((i<<3) + 7, (i<<3)) 
 					- mean.range((j * 24) + (i<<3) + 7, (j * 24) + (i<<3)))
 					* (rgb.range((i<<3) + 7, (i<<3)) 
@@ -74,7 +74,7 @@ sc_biguint<192> GetDistance::read_mean(void){
 	return mean;
 }
 
-void GetDistance::write(sc_biguint<128> distance){ // K-distances
+void GetDistance::write(sc_biguint<144> distance){ // K-distances
     #ifndef NATIVE_SYSTEMC
 	{
 		HLS_DEFINE_PROTOCOL("output");

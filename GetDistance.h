@@ -19,11 +19,11 @@ public:
 #ifndef NATIVE_SYSTEMC
 	cynw_p2p< sc_dt::sc_uint<24> >::in i_rgb;
 	cynw_p2p< sc_dt::sc_biguint<192> >::in i_mean;
-	cynw_p2p< sc_dt::sc_biguint<128> >::out o_result;
+	cynw_p2p< sc_dt::sc_biguint<144> >::out o_result;
 #else
 	sc_fifo_in< sc_dt::sc_uint<24> > i_rgb;
 	sc_fifo_in< sc_dt::sc_biguint<192> > i_mean;
-	sc_fifo_out< sc_dt::sc_biguint<128> > o_result;
+	sc_fifo_out< sc_dt::sc_biguint<144> > o_result;
 #endif
 
 	SC_HAS_PROCESS( GetDistance );
@@ -32,6 +32,6 @@ private:
 	void do_calculation();
 	sc_uint<24> read(void);
 	sc_biguint<192> read_mean(void); // K-means
-	void write(sc_biguint<128> distance); // K-distances
+	void write(sc_biguint<144> distance); // K-distances
 };
 #endif

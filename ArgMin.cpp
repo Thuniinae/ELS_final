@@ -23,17 +23,17 @@ void ArgMin::do_calculation(){
 		wait();
 	}
     while (true){
-		sc_biguint<128> distance;
+		sc_biguint<144> distance;
 		sc_uint<16> min;
 		sc_uint<3> index;
 
 		distance = read();
-		min = distance.range(15, 0);
+		min = distance.range(17, 0);
 		index = 0;
 		// can be more efficient
 		for (int i = 1; i < 8; i++) {
-			if (distance.range((i<<4) + 15, (i<<4)) < min) {
-				min = distance.range((i<<4) + 15, (i<<4));
+			if (distance.range((i * 18) + 17, (i * 18)) < min) {
+				min = distance.range((i * 18) + 17, (i * 18));
 				index = i;
 			}
 		}
@@ -41,8 +41,8 @@ void ArgMin::do_calculation(){
 	}
 }
 
-sc_biguint<128> ArgMin::read() {
-	sc_biguint<128> d;
+sc_biguint<144> ArgMin::read() {
+	sc_biguint<144> d;
 	#ifndef NATIVE_SYSTEMC
 	{
 		HLS_DEFINE_PROTOCOL("input");

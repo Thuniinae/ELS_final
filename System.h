@@ -46,8 +46,8 @@ private:
 	cynw_p2p< sc_dt::sc_biguint<192> >mean2;
 	cynw_p2p< sc_dt::sc_biguint<192> >o_mean1;
 	cynw_p2p< sc_dt::sc_uint<24> >result;
-	cynw_p2p< sc_dt::sc_biguint<128> >distance1;
-	cynw_p2p< sc_dt::sc_biguint<128> >distance2;
+	cynw_p2p< sc_dt::sc_biguint<144> >distance1;
+	cynw_p2p< sc_dt::sc_biguint<144> >distance2;
 	cynw_p2p< sc_dt::sc_uint<3> >index1;
 	cynw_p2p< sc_dt::sc_uint<3> >index2;
 #else
@@ -59,8 +59,8 @@ private:
 	sc_fifo< sc_dt::sc_biguint<192> >mean2;
 	sc_fifo< sc_dt::sc_biguint<192> >o_mean1;
 	sc_fifo< sc_dt::sc_uint<24> >result;
-	sc_fifo< sc_dt::sc_biguint<128> > distance1;
-	sc_fifo< sc_dt::sc_biguint<128> > distance2;
+	sc_fifo< sc_dt::sc_biguint<144> > distance1;
+	sc_fifo< sc_dt::sc_biguint<144> > distance2;
 	sc_fifo< sc_dt::sc_uint<3> > index1;
 	sc_fifo< sc_dt::sc_uint<3> > index2;
 	sc_fifo< sc_dt::sc_biguint<192> > mean3;

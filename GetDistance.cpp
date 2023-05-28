@@ -34,6 +34,9 @@ void GetDistance::do_calculation(){
 		mean = read_mean();
 		// can be unrolled
 		for (int j = 0; j < K; j++) {
+			#ifndef NATIVE_SYSTEMC
+				HLS_UNROLL_LOOP(ON,"GD_loop");
+			#endif
 			// sum the difference square of RGB
 			for (int i = 0; i < 3; i++) {
 				result.range((j * 18) + 17, j * 18) = 

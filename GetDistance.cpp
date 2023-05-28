@@ -9,6 +9,7 @@ GetDistance::GetDistance( sc_module_name n ): sc_module( n )
         
 #ifndef NATIVE_SYSTEMC
 	i_rgb.clk_rst(i_clk, i_rst);
+	i_mean.clk_rst(i_clk, i_rst);
     o_result.clk_rst(i_clk, i_rst);
 #endif
 }
@@ -18,6 +19,7 @@ void GetDistance::do_calculation(){
         #ifndef NATIVE_SYSTEMC
 		HLS_DEFINE_PROTOCOL("main_reset");
 		i_rgb.reset();
+		i_mean.reset();
 		o_result.reset();
         #endif
 		wait();

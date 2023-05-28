@@ -8,7 +8,8 @@ NewMean::NewMean( sc_module_name n ): sc_module( n )
 	reset_signal_is(i_rst, false);
         
 #ifndef NATIVE_SYSTEMC
-	i_distance.clk_rst(i_clk, i_rst);
+	i_index.clk_rst(i_clk, i_rst);
+	i_rgb.clk_rst(i_clk, i_rst);
     o_result.clk_rst(i_clk, i_rst);
 #endif
 }
@@ -17,7 +18,8 @@ void NewMean::do_calculation(){
 	{
         #ifndef NATIVE_SYSTEMC
 		HLS_DEFINE_PROTOCOL("main_reset");
-		i_distance.reset();
+		i_index.reset();
+		i_rgb.reset();
 		o_result.reset();
         #endif
 		wait();

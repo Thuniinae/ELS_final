@@ -252,19 +252,21 @@ void Testbench::feed_rgb() {
   // send initial K-means, K = 8
   sc_biguint<192> mean;
   
-
   // select initial mean
-  mean.range(23, 0) = pixel(width>>1, height>>1);
+  for (int i = 0; i < 8; i++) {
+    mean.range(i * 24 + 7, i * 24) = pixel(rand()%width, rand()%height);
+  }
+ /* mean.range(23, 0) = pixel(width>>1, height>>1);
   mean.range(47, 24) = pixel(width>>2, height>>1);
   mean.range(71, 48) = pixel(width>>1, height>>2);
   mean.range(95, 72) = pixel(width>>2, height>>2);
   mean.range(119, 96) = pixel((width>>1) + (width>>2), (height>>1) + (height>>2));
   mean.range(143, 120) = pixel((width>>1) + (width>>2), height>>1);
   mean.range(167, 144) = pixel(width>>1, (height>>1) + (height>>2));
-  mean.range(191, 168) = pixel((width>>1) + (width>>2), (height>>1) - (height>>2));
+  mean.range(191, 168) = pixel((width>>1) + (width>>2), (height>>1) - (height>>2));*/
   
-
-  for(int i = 0; i < 30; i++) { // send sampled pixels until converge (maximum 30 times)
+  int cnt = 0;
+  for(int k = 0; k < 100; k++) { // send sampled pixels until converge (maximum 30 times)
     for (unsigned int x = 0; x < width; x = x + 16) {
       for (unsigned int y = 0; y < height; y = y + 16) {
         write_mean(mean, 1);
@@ -274,19 +276,41 @@ void Testbench::feed_rgb() {
     }
     sc_biguint<192> new_mean;
     new_mean = read_mean1();
-    if (!converge(mean, new_mean, 10)) // if not converge
+    cout << cnt << endl;
+    /*cout << "means:" << endl;
+		for (int i = 0; i < 8; i++){
+			for (int j =0; j < 3; j++) { // for R, G, B
+				cout << mean.range((i * 24) + (j<<3) + 7, (i * 24) + (j<<3)) << ", ";
+			}
+			cout << endl;
+		}
+    cout << "new means:" << endl;
+		for (int i = 0; i < 8; i++){
+			for (int j =0; j < 3; j++) { // for R, G, B
+				cout << new_mean.range((i * 24) + (j<<3) + 7, (i * 24) + (j<<3)) << ", ";
+			}
+			cout << endl;
+		}*/
+    if (!converge(mean, new_mean, 1)) // if not converge
       mean = new_mean;
     else {
       mean = new_mean;
       break;
     }
+    cnt++;
   }
   // send all the pixels for coloring
   for (unsigned int x = 0; x < width; x++) {
     for (unsigned int y = 0; y < height; y++) {
       write_mean(mean, 2);
       write_mean(mean, 3);
+      /*cout << "rgb:" << endl;
+      for (int j =0; j < 3; j++) { // for R, G, B
+				cout << pixel(x , y).range((j<<3) + 7, (j<<3)) << ", ";
+			}
+      cout << endl;*/
       write(pixel(x , y), 3);
+			
     }
   }
 }

@@ -27,6 +27,19 @@ void ColorPixel::do_calculation(){
 		sc_biguint<192> mean;
 		index = read_index();
 		mean = read_mean();
+		/*cout << "index: " << index << endl;
+		cout << "mean:" << endl;
+		for (int i = 0; i < 8; i++){
+			for (int j =0; j < 3; j++) { // for R, G, B
+				cout << mean.range((i * 24) + (j<<3) + 7, (i * 24) + (j<<3)) << ", ";
+			}
+			cout << endl;
+		}
+		cout << "result: ";
+		for (int j =0; j < 3; j++) { // for R, G, B
+			cout << mean.range((index * 24) + (j<<3) + 7, (index * 24) + (j<<3)) << ", ";
+		}
+		cout << endl;*/
 		write((sc_uint<24>)mean.range(index * 24 + 23, index * 24));
 	}
 }

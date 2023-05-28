@@ -29,7 +29,32 @@ void ColorPixel::do_calculation(){
 		sc_biguint<192> mean;
 		index = read_index();
 		mean = read_mean();
-		write((sc_uint<24>)mean.range(index * 24 + 23, index * 24));
+		switch(index) {
+			case 0:
+				write((sc_uint<24>)mean.range(23, 0));
+				break;
+			case 1:
+				write((sc_uint<24>)mean.range(47, 24));
+				break;
+			case 2:
+				write((sc_uint<24>)mean.range(71, 48));
+				break;
+			case 3:
+				write((sc_uint<24>)mean.range(95, 72));
+				break;
+			case 4:
+				write((sc_uint<24>)mean.range(119, 96));
+				break;
+			case 5:
+				write((sc_uint<24>)mean.range(143, 120));
+				break;
+			case 6:
+				write((sc_uint<24>)mean.range(167, 144));
+				break;
+			default: // 7
+				write((sc_uint<24>)mean.range(191, 168));
+				break;
+		}
 	}
 }
 

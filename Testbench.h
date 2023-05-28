@@ -27,22 +27,24 @@ public:
 	sc_in_clk i_clk;
 	sc_out < bool >  o_rst;
 #ifndef NATIVE_SYSTEMC
-	cynw_p2p< sc_dt::sc_uint<24> >::base_out o_rgb1;
-	cynw_p2p< sc_dt::sc_uint<24> >::base_out o_rgb2;
-	cynw_p2p< sc_dt::sc_uint<24> >::base_out o_rgb3;
-	cynw_p2p< sc_dt::sc_biguint<192> >::base_out o_mean1;
-	cynw_p2p< sc_dt::sc_biguint<192> >::base_out o_mean2;
-	cynw_p2p< sc_dt::sc_biguint<192> >::base_out o_mean3;
-	cynw_p2p< sc_dt::sc_biguint<192> >::base_in i_mean1;
+	cynw_p2p< sc_dt::sc_uint<24> >::base_out o_rgbTG;
+	cynw_p2p< sc_dt::sc_uint<24> >::base_out o_rgbTN;
+	cynw_p2p< sc_dt::sc_biguint<192> >::base_out o_meanTG;
+	cynw_p2p< sc_dt::sc_biguint<192> >::base_out o_meanTC;
+	cynw_p2p< sc_dt::sc_uint<3> >::base_out o_indexTN;
+	cynw_p2p< sc_dt::sc_uint<3> >::base_out o_indexTC;
+	cynw_p2p< sc_dt::sc_uint<3> >::base_in i_indexAT;
+	cynw_p2p< sc_dt::sc_uint<192> >::base_in i_meanNT;
 	cynw_p2p< sc_dt::sc_uint<24> >::base_in i_result;
 #else
-	sc_fifo_out< sc_dt::sc_uint<24> > o_rgb1;
-	sc_fifo_out< sc_dt::sc_uint<24> > o_rgb2;
-	sc_fifo_out< sc_dt::sc_uint<24> > o_rgb3;
-	sc_fifo_out< sc_dt::sc_biguint<192> > o_mean1;
-	sc_fifo_out< sc_dt::sc_biguint<192> > o_mean2;
-	sc_fifo_out< sc_dt::sc_biguint<192> > o_mean3;
-	sc_fifo_in< sc_dt::sc_biguint<192> > i_mean1;
+	sc_fifo_out< sc_dt::sc_uint<24> > o_rgbTG;
+	sc_fifo_out< sc_dt::sc_uint<24> > o_rgbTN;
+	sc_fifo_out< sc_dt::sc_biguint<192> > o_meanTG;
+	sc_fifo_out< sc_dt::sc_biguint<192> > o_meanTC;
+	sc_fifo_out< sc_dt::sc_uint<3> > o_indexTN;
+	sc_fifo_out< sc_dt::sc_uint<3> > o_indexTC;
+	sc_fifo_in< sc_dt::sc_uint<3> > i_indexAT;
+	sc_fifo_in< sc_dt::sc_biguint<192> > i_meanNT;
 	sc_fifo_in< sc_dt::sc_uint<24> > i_result;
 #endif
 
@@ -88,7 +90,9 @@ private:
   sc_uint<24> pixel(unsigned int i, unsigned int j);
   void write(sc_uint<24> rgb, int channel);
   void write_mean(sc_biguint<192> mean, int channel);
-  sc_biguint<192> read_mean1();
+  sc_biguint<192> read_mean();
+  sc_uint<3> read_index();
+  void write_index(sc_uint<3> index, int channel);
   void feed_rgb();
 	void fetch_result();
   bool converge (sc_biguint<192> mean1, sc_biguint<192> mean2, sc_uint<8> threshold);

@@ -140,25 +140,17 @@ void Testbench::write(sc_uint<24> rgb, int channel) {
   switch(channel){
     case 1:
       #ifndef NATIVE_SYSTEMC
-        o_rgb1.put(rgb);
+        o_rgbTG.put(rgb);
       #else
-        o_rgb1.write(rgb);
+        o_rgbTG.write(rgb);
         wait(1); //emulate channel delay
       #endif
       break;
     case 2:
       #ifndef NATIVE_SYSTEMC
-        o_rgb2.put(rgb);
+        o_rgbTN.put(rgb);
       #else
-        o_rgb2.write(rgb);
-        wait(1); //emulate channel delay
-      #endif
-      break;
-    case 3:
-      #ifndef NATIVE_SYSTEMC
-        o_rgb3.put(rgb);
-      #else
-        o_rgb3.write(rgb);
+        o_rgbTN.write(rgb);
         wait(1); //emulate channel delay
       #endif
       break;
@@ -194,25 +186,17 @@ void Testbench::write_mean(sc_biguint<192> mean, int channel){
   switch(channel){
     case 1:
       #ifndef NATIVE_SYSTEMC
-        o_mean1.put(mean);
+        o_meanTG.put(mean);
       #else
-        o_mean1.write(mean);
+        o_meanTG.write(mean);
         wait(1); //emulate channel delay
       #endif
       break;
     case 2:
       #ifndef NATIVE_SYSTEMC
-        o_mean2.put(mean);
+        o_meanTC.put(mean);
       #else
-        o_mean2.write(mean);
-        wait(1); //emulate channel delay
-      #endif
-      break;
-    case 3:
-      #ifndef NATIVE_SYSTEMC
-        o_mean3.put(mean);
-      #else
-        o_mean3.write(mean);
+        o_meanTC.write(mean);
         wait(1); //emulate channel delay
       #endif
       break;
@@ -222,26 +206,62 @@ void Testbench::write_mean(sc_biguint<192> mean, int channel){
   }
 }
 
-sc_biguint<192> Testbench::read_mean1() {
+sc_biguint<192> Testbench::read_mean() {
   sc_biguint<192> mean;
   #ifndef NATIVE_SYSTEMC
-    mean = i_mean1.get();
+    mean = i_meanNT.get();
   #else
-    mean = i_mean1.read();
+    mean = i_meanNT.read();
   #endif
   return mean;
+}
+
+sc_uint<3> Testbench::read_index() {
+  sc_uint<3> index;
+  #ifndef NATIVE_SYSTEMC
+    index = i_indexAT.get();
+  #else
+    index = i_indexAT.read();
+  #endif
+  return index;
+}
+
+void Testbench::write_index(sc_uint<3> index, int channel) {
+  switch(channel){
+    case 1:
+      #ifndef NATIVE_SYSTEMC
+        o_indexTN.put(index);
+      #else
+        o_indexTN.write(index);
+        wait(1); //emulate channel delay
+      #endif
+      break;
+    case 2:
+      #ifndef NATIVE_SYSTEMC
+        o_indexTC.put(index);
+      #else
+        o_indexTC.write(index);
+        wait(1); //emulate channel delay
+      #endif
+      break;
+    default:
+      cout << "unknown mean channel!" << endl;
+      break;
+  }
 }
 
 
 void Testbench::feed_rgb() {
   #ifndef NATIVE_SYSTEMC
-    o_rgb1.reset();
-    o_rgb2.reset();
-    o_rgb3.reset();
-	  o_mean1.reset();
-	  i_mean1.reset();
-	  o_mean2.reset();
-	  o_mean3.reset();
+    o_rgbTG.reset();
+    o_rgbTN.reset();
+	  o_meanTG.reset();
+	  o_meanTC.reset();
+    o_indexTN.reset();
+    o_indexTC.reset();
+    i_indexAT.reset();
+	  i_meanNT.reset();
+    i_result.reset();
   #endif
 	o_rst.write(false);
 	wait(5);
@@ -264,19 +284,19 @@ void Testbench::feed_rgb() {
   mean.range(143, 120) = pixel((width>>1) + (width>>2), height>>1);
   mean.range(167, 144) = pixel(width>>1, (height>>1) + (height>>2));
   mean.range(191, 168) = pixel((width>>1) + (width>>2), (height>>1) - (height>>2));
-  
   int cnt = 0;
   for(int k = 0; k < 30; k++) { // send sampled pixels until converge (maximum 30 times)
     for (unsigned int x = 0; x < width; x = x + 16) {
       for (unsigned int y = 0; y < height; y = y + 16) {
         write_mean(mean, 1);
         write(pixel(x , y), 1);
+        write_index(read_index(), 1);
         write(pixel(x , y), 2);
       }
     }
     sc_biguint<192> new_mean;
-    new_mean = read_mean1();
-    cout << cnt << endl;
+    new_mean = read_mean();
+    /*cout << cnt << endl;
     cout << "means:" << endl;
 		for (int i = 0; i < 8; i++){
 			for (int j =0; j < 3; j++) { // for R, G, B
@@ -290,7 +310,7 @@ void Testbench::feed_rgb() {
 				cout << new_mean.range((i * 24) + (j<<3) + 7, (i * 24) + (j<<3)) << ", ";
 			}
 			cout << endl;
-		}
+		}*/
     if (!converge(mean, new_mean, 1)) // if not converge
       mean = new_mean;
     else {
@@ -302,10 +322,10 @@ void Testbench::feed_rgb() {
   // send all the pixels for coloring
   for (unsigned int x = 0; x < width; x++) {
     for (unsigned int y = 0; y < height; y++) {
+      write(pixel(x , y), 1);
+      write_mean(mean, 1);
+      write_index(read_index(), 2);
       write_mean(mean, 2);
-      write_mean(mean, 3);
-      write(pixel(x , y), 3);
-			
     }
   }
 }

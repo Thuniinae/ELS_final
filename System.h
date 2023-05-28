@@ -25,46 +25,40 @@ public:
 private:
   Testbench tb;
 #ifndef NATIVE_SYSTEMC
-	GetDistance_wrapper gd1, gd2;
-	ArgMin_wrapper am1, am2;
+	GetDistance_wrapper gd;
+	ArgMin_wrapper am;
 	NewMean_wrapper nm;
 	ColorPixel_wrapper cp;
 #else
-	GetDistance gd1, gd2;
-	ArgMin am1, am2;
+	GetDistance gd;
+	ArgMin am;
 	NewMean nm;
 	ColorPixel cp;
 #endif
 	sc_clock clk;
 	sc_signal<bool> rst;
 #ifndef NATIVE_SYSTEMC
-	cynw_p2p< sc_dt::sc_uint<24> >rgb1;
-	cynw_p2p< sc_dt::sc_uint<24> >rgb2;
-	cynw_p2p< sc_dt::sc_uint<24> >rgb3;
-	cynw_p2p< sc_dt::sc_uint<24> >rgb4;
-	cynw_p2p< sc_dt::sc_biguint<192> >i_mean1;
-	cynw_p2p< sc_dt::sc_biguint<192> >mean2;
-	cynw_p2p< sc_dt::sc_biguint<192> >o_mean1;
+	cynw_p2p< sc_dt::sc_uint<24> >rgbTG;
+	cynw_p2p< sc_dt::sc_uint<24> >rgbTN;
+	cynw_p2p< sc_dt::sc_biguint<192> >meanTG;
+	cynw_p2p< sc_dt::sc_biguint<192> >meanNT;
+	cynw_p2p< sc_dt::sc_biguint<192> >meanTC;
 	cynw_p2p< sc_dt::sc_uint<24> >result;
-	cynw_p2p< sc_dt::sc_biguint<144> >distance1;
-	cynw_p2p< sc_dt::sc_biguint<144> >distance2;
-	cynw_p2p< sc_dt::sc_uint<3> >index1;
-	cynw_p2p< sc_dt::sc_uint<3> >index2;
-	cynw_p2p< sc_dt::sc_biguint<192> >mean3;
+	cynw_p2p< sc_dt::sc_biguint<144> >distance;
+	cynw_p2p< sc_dt::sc_uint<3> >indexAT;
+	cynw_p2p< sc_dt::sc_uint<3> >indexTN;
+	cynw_p2p< sc_dt::sc_uint<3> >indexTC;
 #else
-	sc_fifo< sc_dt::sc_uint<24> >rgb1;
-	sc_fifo< sc_dt::sc_uint<24> >rgb2;
-	sc_fifo< sc_dt::sc_uint<24> >rgb3;
-	sc_fifo< sc_dt::sc_uint<24> >rgb4;
-	sc_fifo< sc_dt::sc_biguint<192> >i_mean1;
-	sc_fifo< sc_dt::sc_biguint<192> >mean2;
-	sc_fifo< sc_dt::sc_biguint<192> >o_mean1;
+	sc_fifo< sc_dt::sc_uint<24> >rgbTG;
+	sc_fifo< sc_dt::sc_uint<24> >rgbTN;
+	sc_fifo< sc_dt::sc_biguint<192> >meanTG;
+	sc_fifo< sc_dt::sc_biguint<192> >meanNT;
+	sc_fifo< sc_dt::sc_biguint<192> >meanTC;
 	sc_fifo< sc_dt::sc_uint<24> >result;
-	sc_fifo< sc_dt::sc_biguint<144> > distance1;
-	sc_fifo< sc_dt::sc_biguint<144> > distance2;
-	sc_fifo< sc_dt::sc_uint<3> > index1;
-	sc_fifo< sc_dt::sc_uint<3> > index2;
-	sc_fifo< sc_dt::sc_biguint<192> > mean3;
+	sc_fifo< sc_dt::sc_biguint<144> > distance;
+	sc_fifo< sc_dt::sc_uint<3> > indexAT;
+	sc_fifo< sc_dt::sc_uint<3> > indexTN;
+	sc_fifo< sc_dt::sc_uint<3> > indexTC;
 #endif
 
 	std::string _output_bmp;

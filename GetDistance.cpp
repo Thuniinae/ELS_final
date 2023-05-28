@@ -36,6 +36,9 @@ void GetDistance::do_calculation(){
 			#ifndef NATIVE_SYSTEMC
 				HLS_UNROLL_LOOP(ON,"GD_loop");
 			#endif
+			#ifndef NATIVE_SYSTEMC
+				HLS_CONSTRAIN_LATENCY(0, HLS_ACHIEVABLE, "GD_loop");
+			#endif
 			// sum the difference square of RGB
 			result.range((j * 18) + 17, j * 18)
 				= (rgb.range(7, 0) - mean.range((j * 24) + 7, (j * 24)) )

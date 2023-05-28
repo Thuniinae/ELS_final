@@ -29,7 +29,6 @@ void GetDistance::do_calculation(){
 		sc_biguint<192> mean;
 		sc_biguint<144> result;
 
-		result = 0;
 		rgb = read();
 		mean = read_mean();
 		// can be unrolled
@@ -38,14 +37,13 @@ void GetDistance::do_calculation(){
 				HLS_UNROLL_LOOP(ON,"GD_loop");
 			#endif
 			// sum the difference square of RGB
-			for (int i = 0; i < 3; i++) {
-				result.range((j * 18) + 17, j * 18) = 
-					result.range((j * 18) + 17, j * 18)+ 
-					(rgb.range((i<<3) + 7, (i<<3)) 
-					- mean.range((j * 24) + (i<<3) + 7, (j * 24) + (i<<3)))
-					* (rgb.range((i<<3) + 7, (i<<3)) 
-					- mean.range((j * 24) + (i<<3) + 7, (j * 24) + (i<<3)));
-			}
+			result.range((j * 18) + 17, j * 18)
+				= (rgb.range(7, 0) - mean.range((j * 24) + 7, (j * 24)) )
+				* (rgb.range(7, 0) - mean.range((j * 24) + 7, (j * 24)) )
+				+ (rgb.range(15, 8) - mean.range((j * 24) + 15, (j * 24) + 8) )
+				* (rgb.range(15, 8) - mean.range((j * 24) + 15, (j * 24) + 8) )
+				+ (rgb.range(23, 16) - mean.range((j * 24) + 23, (j * 24) + 16) )
+				* (rgb.range(23, 16) - mean.range((j * 24) + 23, (j * 24) + 16) );
 		}
 		write(result);
 	}

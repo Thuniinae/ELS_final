@@ -261,7 +261,6 @@ void Testbench::feed_rgb() {
     o_indexTC.reset();
     i_indexAT.reset();
 	  i_meanNT.reset();
-    i_result.reset();
   #endif
 	o_rst.write(false);
 	wait(5);

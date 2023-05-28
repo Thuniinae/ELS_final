@@ -287,10 +287,10 @@ void Testbench::feed_rgb() {
   for(int k = 0; k < 30; k++) { // send sampled pixels until converge (maximum 30 times)
     for (unsigned int x = 0; x < width; x = x + 16) {
       for (unsigned int y = 0; y < height; y = y + 16) {
-        write_mean(mean, 1);
         write(pixel(x , y), 1);
-        write_index(read_index(), 1);
+        write_mean(mean, 1);
         write(pixel(x , y), 2);
+        write_index(read_index(), 1);
       }
     }
     sc_biguint<192> new_mean;

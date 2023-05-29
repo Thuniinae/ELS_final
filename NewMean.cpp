@@ -49,39 +49,15 @@ void NewMean::do_calculation(){
 		}
 		// calculate average
 		for (int i = 0; i < 8; i++){
+			#ifndef NATIVE_SYSTEMC
+				HLS_UNROLL_LOOP(ON,"NM_loop");
+			#endif
 			if (mean_num[i] != 0){
-				sc_uint<8> x;
-				switch(i){
-					case 0:
-						x = 0;
-						break;
-					case 1:
-						x = 3;
-						break;
-					case 2:
-						x = 6;
-						break;
-					case 3:
-						x = 9;
-						break;
-					case 4:
-						x = 12;
-						break;
-					case 5:
-						x = 15;
-						break;
-					case 6:
-						x = 18;
-						break;
-					default: // 7
-						x = 21;
-						break;
-				}
-				new_means.range((x<<3) + 7, (x<<3))
+				new_means.range((i*24) + 7, (i*24))
 					 =  total_mean[i].range(17, 0) / mean_num[i];
-				new_means.range((x<<3) + 15, (x<<3) + 8)
+				new_means.range((i*24) + 15, (i*24) + 8)
 					 =  total_mean[i].range(35, 18) / mean_num[i];
-				new_means.range((x<<3) + 23, (x<<3) + 16)
+				new_means.range((i*24) + 23, (i*24) + 16)
 					 =  total_mean[i].range(53, 36) / mean_num[i];
 			}
 		}

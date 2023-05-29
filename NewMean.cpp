@@ -47,13 +47,42 @@ void NewMean::do_calculation(){
 				+ rgb.range(23, 16);
 			mean_num[index] += 1;
 		}
+		// calculate average
 		for (int i = 0; i < 8; i++){
-			for (int j =0; j < 3; j++) { // for R, G, B
-				if (mean_num[i] != 0)
-					new_means.range((i * 24) + (j<<3) + 7, (i * 24) + (j<<3))
-					=  total_mean[i].range((j*18) + 17, j*18) / mean_num[i]; 
-				else
-					new_means.range((i * 24) + (j<<3) + 7, (i * 24) + (j<<3)) = 0;
+			if (mean_num[i] != 0){
+				sc_uint<8> x;
+				switch(i){
+					case 0:
+						x = 0;
+						break;
+					case 1:
+						x = 3;
+						break;
+					case 2:
+						x = 6;
+						break;
+					case 3:
+						x = 9;
+						break;
+					case 4:
+						x = 12;
+						break;
+					case 5:
+						x = 15;
+						break;
+					case 6:
+						x = 18;
+						break;
+					default: // 7
+						x = 21;
+						break;
+				}
+				new_means.range((x<<3) + 7, (x<<3))
+					 =  total_mean[i].range(17, 0) / mean_num[i];
+				new_means.range((x<<3) + 15, (x<<3) + 8)
+					 =  total_mean[i].range(35, 18) / mean_num[i];
+				new_means.range((x<<3) + 23, (x<<3) + 16)
+					 =  total_mean[i].range(53, 36) / mean_num[i];
 			}
 		}
 		write(new_means);

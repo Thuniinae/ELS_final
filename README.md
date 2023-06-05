@@ -1,30 +1,25 @@
-# Median and Weighted Mean Filter (MWMF)
+# K-means Segmentation
 
-Median and Weighted Mean Filter module with FIFO interfaces.
+K-means Segmentation in systemc and Stratus HLS.
 
 ## Execution
 1. Login NTHUEE server and source the tool
 2. clone the project
-> $ git clone https://github.com/Thuniinae/ELS_hw03.git
+> $ git clone https://github.com/Thuniinae/ELS_final.git
 2. move into the directory
-> $ cd ELS_hw03
+> $ cd ELS_final
 3. execute the code
 
-    &emsp;There are three branchs in total, which are main, coding, optimize, representing problem 1, 2, and 3.
+    &emsp;There are two branchs in total, which are main, optimize, representing the original design and optimize design in HLS.
 
-    1. Median and mean filters with TLM interface
+    1. Original
     > $ git checkout main  
     $ cd stratus  
     $ make sim_V_BASIC 
     
-    2. Median and mean filters with quantum keeper
-    > $ git checkout coding  
+    2. Optimize design
+    > $ git checkout optimize
     $ cd stratus  
     $ make sim_V_BASIC 
-    
-    3.  Median and mean filters with TLM interconnect
-    > $ git checkout optimize  
-    $ cd stratus  
-    $ make sim_V_BASIC  
 
-    All of the output should be output.bmp which is MWMF result of lena_std_short.bmp
+    All of the output should be lena_color_512_seg.bmp which is K-means segmentation result of lena_color_512.bmp
